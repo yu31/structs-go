@@ -77,54 +77,13 @@ func TestList_createNode(t *testing.T) {
 	}
 }
 
-func TestList_Insert(t *testing.T) {
-	sl := New()
-
-	require.NotNil(t, sl.Insert(container.Int(11), 1024))
-	require.Nil(t, sl.Insert(container.Int(11), 1023))
-	require.NotNil(t, sl.Insert(container.Int(33), nil))
-	require.Nil(t, sl.Insert(container.Int(33), nil))
-	require.NotNil(t, sl.Insert(container.Int(22), nil))
-	require.Nil(t, sl.Insert(container.Int(22), nil))
-}
-
 func TestList_Delete(t *testing.T) {
 	sl := New()
 	require.NotNil(t, sl.Insert(container.Int(11), 1021))
-	require.NotNil(t, sl.Insert(container.Int(22), 1022))
-	require.NotNil(t, sl.Insert(container.Int(33), 1023))
 
 	element := sl.Delete(container.Int(11))
 	require.NotNil(t, element)
-	require.Equal(t, element.Key().Compare(container.Int(11)), 0)
-	require.Equal(t, element.Value(), 1021)
 	require.Nil(t, element.(*listNode).next)
-	require.Nil(t, sl.Delete(container.Int(11)))
-
-	require.NotNil(t, sl.Delete(container.Int(22)))
-	require.Nil(t, sl.Delete(container.Int(22)))
-	require.NotNil(t, sl.Delete(container.Int(33)))
-	require.Nil(t, sl.Delete(container.Int(33)))
-
-	// Try to delete key not exists.
-	require.Nil(t, sl.Delete(container.Int(1024)))
-}
-
-func TestList_Search(t *testing.T) {
-	sl := New()
-	require.NotNil(t, sl.Insert(container.Int(11), 1021))
-	require.NotNil(t, sl.Insert(container.Int(22), 1022))
-	require.NotNil(t, sl.Insert(container.Int(33), 1023))
-
-	require.Equal(t, sl.Search(container.Int(11)).Key().Compare(container.Int(11)), 0)
-	require.Equal(t, sl.Search(container.Int(11)).Value(), 1021)
-	require.Equal(t, sl.Search(container.Int(22)).Key().Compare(container.Int(22)), 0)
-	require.Equal(t, sl.Search(container.Int(22)).Value(), 1022)
-	require.Equal(t, sl.Search(container.Int(33)).Key().Compare(container.Int(33)), 0)
-	require.Equal(t, sl.Search(container.Int(33)).Value(), 1023)
-
-	// Try to search key not exists.
-	require.Nil(t, sl.Search(container.Int(1024)))
 }
 
 func TestList(t *testing.T) {
