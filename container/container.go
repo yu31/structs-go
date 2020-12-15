@@ -25,22 +25,38 @@ type Container interface {
 	// Len returns the number of elements.
 	Len() int
 
-	// Insert inserts the giving key and value as an Element and return.
+	// Insert inserts and returns an Element with the given key and value.
 	// Returns nil if key already exists.
-	Insert(k Key, v Value) (element Element)
+	//
+	// NOTICE: This method should not allow inserts with an exists key.
+	// You can use the Replace method if the action you expect is "insert or update".
+	Insert(k Key, v Value) Element
 
 	// Delete removes and returns the Element of a given key.
-	// Returns nil if not found.
-	Delete(k Key) (element Element)
+	// Returns nil if key not found.
+	Delete(k Key) Element
 
-	// Search returns the Element of a given key.
-	// Returns nil if not found.
-	Search(k Key) (element Element)
-
-	// Iter creates an iterator to iteration return element.
+	// Update updates and returns an Element with the given key and value.
+	// Returns nil if key not found.
 	//
-	// The element range is start <= x < boundary.
-	// The element will return from the beginning if start is nil,
+	// NOTICE: This method should not allow updates with an not exist key.
+	// You can use the Replace method if the action you expect is "insert or update".
+	Update(k Key, v Value) Element
+
+	// Replace inserts or updates an Element by giving key and value.
+	//
+	// The action are same as an Insert method if key not found,
+	// And are same as an Update method if found the key.
+	Replace(k Key, v Value) Element
+
+	// Search searches the Element of a given key.
+	// Returns nil if key not found.
+	Search(k Key) Element
+
+	// Iter creates an iterator to the iteration return element.
+	//
+	// The elements range is start <= x < boundary.
+	// The elements will return from the beginning if start is nil,
 	// And return until the end if the boundary is nil.
 	Iter(start Key, boundary Key) Iterator
 }

@@ -21,7 +21,7 @@ func LDR(root TreeNode, f func(n TreeNode)) {
 	s := stack.Default()
 	p := root
 
-	for !s.Empty() || !reflect.ValueOf(p).IsNil() {
+	for !s.Empty() || (p != nil && !reflect.ValueOf(p).IsNil()) {
 		if !reflect.ValueOf(p).IsNil() {
 			s.Push(p)
 			p = p.Left()
@@ -44,7 +44,7 @@ func DLR(root TreeNode, f func(n TreeNode)) {
 	s := stack.Default()
 	p := root
 
-	for !s.Empty() || !reflect.ValueOf(p).IsNil() {
+	for !s.Empty() || (p != nil && !reflect.ValueOf(p).IsNil()) {
 		if !reflect.ValueOf(p).IsNil() {
 			f(p)
 
@@ -69,7 +69,7 @@ func LRD(root TreeNode, f func(n TreeNode)) {
 	s := stack.Default()
 	p := root
 
-	for !reflect.ValueOf(p).IsNil() {
+	for p != nil && !reflect.ValueOf(p).IsNil() {
 		s.Push(p)
 		p = p.Left()
 	}

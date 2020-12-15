@@ -65,7 +65,7 @@ func (sl *List) Len() int {
 	return sl.lens[0]
 }
 
-// Insert inserts the giving key and value as an Element and return.
+// Insert inserts and returns an Element with the given key and value.
 // Returns nil if key already exists.
 func (sl *List) Insert(k Key, v Value) Element {
 	var updates [maxLevel + 1]*listNode
@@ -129,8 +129,22 @@ func (sl *List) Delete(k Key) Element {
 	return d
 }
 
-// Search returns the Element of a given key.
-// Returns nil if not found.
+// Update updates and returns an Element with the given key and value.
+// Returns nil if key not found.
+func (sl *List) Update(k Key, v Value) Element {
+	panic("not implemented")
+}
+
+// Replace inserts or updates an Element by giving key and value.
+//
+// The action are same as an Insert method if key not found,
+// And are same as an Update method if found the key.
+func (sl *List) Replace(k Key, v Value) Element {
+	panic("not implemented")
+}
+
+// Search searches the Element of a given key.
+// Returns nil if key not found.
 func (sl *List) Search(k Key) Element {
 	p := sl.head
 	for i := sl.level; i >= 0; i-- {

@@ -29,17 +29,11 @@ func Test_Interface(t *testing.T) {
 	// Ensure the interface is implemented.
 	var node TreeNode
 	var element container.Element
-	var ct container.Container
-	var it container.Iterator
 
 	node = &treeNode{}
 	_ = node
 	element = &treeNode{}
 	_ = element
-	ct = New()
-	_ = ct
-	it = NewIterator(node, nil, nil)
-	_ = it
 }
 
 func TestNew(t *testing.T) {

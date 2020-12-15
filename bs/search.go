@@ -23,7 +23,7 @@ func SearchRange(root TreeNode, start Key, boundary Key, f func(n TreeNode)) {
 
 	s := stack.Default()
 	p := root
-	for !s.Empty() || !reflect.ValueOf(p).IsNil() {
+	for !s.Empty() || (p != nil && !reflect.ValueOf(p).IsNil()) {
 		if !reflect.ValueOf(p).IsNil() {
 			if start != nil && p.Key().Compare(start) == -1 {
 				p = p.Right()
@@ -53,7 +53,7 @@ func SearchLastLT(root TreeNode, key Key) TreeNode {
 	var n TreeNode
 
 	p := root
-	for !reflect.ValueOf(p).IsNil() {
+	for p != nil && !reflect.ValueOf(p).IsNil() {
 		flag := key.Compare(p.Key())
 		if flag == 1 {
 			n = p
@@ -75,7 +75,7 @@ func SearchLastLE(root TreeNode, key Key) TreeNode {
 	var n TreeNode
 
 	p := root
-	for !reflect.ValueOf(p).IsNil() {
+	for p != nil && !reflect.ValueOf(p).IsNil() {
 		flag := key.Compare(p.Key())
 		if flag == 1 {
 			n = p
@@ -100,7 +100,7 @@ func SearchFirstGT(root TreeNode, key Key) TreeNode {
 	var n TreeNode
 
 	p := root
-	for !reflect.ValueOf(p).IsNil() {
+	for p != nil && !reflect.ValueOf(p).IsNil() {
 		flag := key.Compare(p.Key())
 		if flag == -1 {
 			n = p
@@ -122,7 +122,7 @@ func SearchFirstGE(root TreeNode, key Key) TreeNode {
 	var n TreeNode
 
 	p := root
-	for !reflect.ValueOf(p).IsNil() {
+	for p != nil && !reflect.ValueOf(p).IsNil() {
 		flag := key.Compare(p.Key())
 		if flag == -1 {
 			n = p

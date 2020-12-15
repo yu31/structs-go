@@ -64,7 +64,7 @@ func (it *Iterator) Next() Element {
 
 func fillStack(root TreeNode, start Key, boundary Key, s *stack.Stack) {
 	p := root
-	for !reflect.ValueOf(p).IsNil() {
+	for p != nil && !reflect.ValueOf(p).IsNil() {
 		if start != nil && p.Key().Compare(start) == -1 {
 			p = p.Right()
 			continue

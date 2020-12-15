@@ -38,15 +38,9 @@ func checkCorrect(t *testing.T, sl *List) {
 func Test_Interface(t *testing.T) {
 	// Ensure the interface is implemented.
 	var element container.Element
-	var ct container.Container
-	var it container.Iterator
+	_ = element
 
 	element = &listNode{}
-	_ = element
-	ct = New()
-	_ = ct
-	it = ct.Iter(nil, nil)
-	_ = it
 }
 
 func TestNew(t *testing.T) {
