@@ -11,6 +11,7 @@ import (
 	"github.com/yu31/gostructs/avl"
 	"github.com/yu31/gostructs/bs"
 	"github.com/yu31/gostructs/container"
+	"github.com/yu31/gostructs/internal/tree"
 	"github.com/yu31/gostructs/rb"
 	"github.com/yu31/gostructs/skip"
 )
@@ -49,7 +50,7 @@ func TestContainer_Interface(t *testing.T) {
 	t.Run("iterator", func(t *testing.T) {
 		var it container.Iterator
 		_ = it
-		it = bs.NewIterator(nil, nil, nil)
+		it = tree.NewIterator(nil, nil, nil)
 	})
 
 	t.Run("tree", func(t *testing.T) {

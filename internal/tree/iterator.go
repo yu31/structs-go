@@ -3,11 +3,12 @@
 // Use of this source code is governed by a MIT-style license that can be
 // found in the LICENSE file.
 
-package bs
+package tree
 
 import (
 	"reflect"
 
+	"github.com/yu31/gostructs/container"
 	"github.com/yu31/gostructs/stack"
 )
 
@@ -23,12 +24,12 @@ import (
 // And it is also the implementation of interface container.Iterator
 type Iterator struct {
 	s        *stack.Stack
-	start    Key
-	boundary Key
+	start    container.Key
+	boundary container.Key
 }
 
 // NewIterator creates an Iterator with given parameters.
-func NewIterator(root TreeNode, start Key, boundary Key) *Iterator {
+func NewIterator(root container.TreeNode, start container.Key, boundary container.Key) *Iterator {
 	s := stack.Default()
 
 	fillStack(root, start, boundary, s)
@@ -49,12 +50,12 @@ func (it *Iterator) Valid() bool {
 
 // Next returns a Element and moved the iterator to the next Element.
 // Returns nil if no more elements.
-func (it *Iterator) Next() Element {
+func (it *Iterator) Next() container.Element {
 	if it.s.Empty() {
 		return nil
 	}
 
-	p := it.s.Pop().(TreeNode)
+	p := it.s.Pop().(container.TreeNode)
 	n := p
 
 	fillStack(p.Right(), it.start, it.boundary, it.s)
@@ -62,7 +63,7 @@ func (it *Iterator) Next() Element {
 	return n
 }
 
-func fillStack(root TreeNode, start Key, boundary Key, s *stack.Stack) {
+func fillStack(root container.TreeNode, start container.Key, boundary container.Key, s *stack.Stack) {
 	p := root
 	for p != nil && !reflect.ValueOf(p).IsNil() {
 		if start != nil && p.Key().Compare(start) == -1 {

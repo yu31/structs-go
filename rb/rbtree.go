@@ -6,8 +6,8 @@
 package rb
 
 import (
-	"github.com/yu31/gostructs/bs"
 	"github.com/yu31/gostructs/container"
+	"github.com/yu31/gostructs/internal/tree"
 )
 
 const (
@@ -129,35 +129,35 @@ func (tr *Tree) Search(k Key) Element {
 
 // Iter return an Iterator, it's a wrap for bs.Iterator.
 func (tr *Tree) Iter(start Key, boundary Key) container.Iterator {
-	return bs.NewIterator(tr.root, start, boundary)
+	return tree.NewIterator(tr.root, start, boundary)
 }
 
 // Range calls f sequentially each TreeNode present in the Tree.
 // If f returns false, range stops the iteration.
 func (tr *Tree) Range(start Key, boundary Key, f func(ele Element) bool) {
-	bs.Range(tr.root, start, boundary, func(node TreeNode) bool {
+	tree.Range(tr.root, start, boundary, func(node TreeNode) bool {
 		return f(node)
 	})
 }
 
 // LastLT searches for the last node that less than the key.
 func (tr *Tree) LastLT(k Key) Element {
-	return bs.LastLT(tr.root, k)
+	return tree.LastLT(tr.root, k)
 }
 
 // LastLE search for the last node that less than or equal to the key.
 func (tr *Tree) LastLE(k Key) Element {
-	return bs.LastLE(tr.root, k)
+	return tree.LastLE(tr.root, k)
 }
 
 // FirstGT search for the first node that greater than to the key.
 func (tr *Tree) FirstGT(k Key) Element {
-	return bs.FirstGT(tr.root, k)
+	return tree.FirstGT(tr.root, k)
 }
 
 // FirstGE search for the first node that greater than or equal to the key.
 func (tr *Tree) FirstGE(k Key) Element {
-	return bs.FirstGE(tr.root, k)
+	return tree.FirstGE(tr.root, k)
 }
 
 // The insertOrSearch inserts and returns a new node with the given key and value if key doesn't exists.

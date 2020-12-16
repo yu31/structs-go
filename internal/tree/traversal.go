@@ -3,18 +3,19 @@
 // Use of this source code is governed by a MIT-style license that can be
 // found in the LICENSE file.
 
-package bs
+package tree
 
 import (
 	"reflect"
 
+	"github.com/yu31/gostructs/container"
 	"github.com/yu31/gostructs/stack"
 )
 
 // LDR calls f sequentially each TreeNode by in-order traversal.
 // If f returns false, range stops the iteration.
 // The order: Left -> Middle -> Right.
-func LDR(root TreeNode, f func(node TreeNode) bool) {
+func LDR(root container.TreeNode, f func(node container.TreeNode) bool) {
 	if root == nil {
 		return
 	}
@@ -27,7 +28,7 @@ func LDR(root TreeNode, f func(node TreeNode) bool) {
 			s.Push(p)
 			p = p.Left()
 		} else {
-			n := s.Pop().(TreeNode)
+			n := s.Pop().(container.TreeNode)
 			p = n.Right()
 
 			if !f(n) {
@@ -40,7 +41,7 @@ func LDR(root TreeNode, f func(node TreeNode) bool) {
 // DLR calls f sequentially each TreeNode by pre-order traversal.
 // If f returns false, range stops the iteration.
 // The order: Middle -> Left -> Right.
-func DLR(root TreeNode, f func(node TreeNode) bool) {
+func DLR(root container.TreeNode, f func(node container.TreeNode) bool) {
 	if root == nil {
 		return
 	}
@@ -57,7 +58,7 @@ func DLR(root TreeNode, f func(node TreeNode) bool) {
 			s.Push(p)
 			p = p.Left()
 		} else {
-			p = s.Pop().(TreeNode)
+			p = s.Pop().(container.TreeNode)
 			p = p.Right()
 		}
 	}
@@ -66,12 +67,12 @@ func DLR(root TreeNode, f func(node TreeNode) bool) {
 // LRD calls f sequentially each TreeNode by post-order traversal.
 // If f returns false, range stops the iteration.
 // The order: Left -> Right -> Middle.
-func LRD(root TreeNode, f func(node TreeNode) bool) {
+func LRD(root container.TreeNode, f func(node container.TreeNode) bool) {
 	if root == nil {
 		return
 	}
 
-	var lastVisit TreeNode
+	var lastVisit container.TreeNode
 
 	s := stack.Default()
 	p := root
@@ -82,7 +83,7 @@ func LRD(root TreeNode, f func(node TreeNode) bool) {
 	}
 
 	for !s.Empty() {
-		p = s.Pop().(TreeNode)
+		p = s.Pop().(container.TreeNode)
 		if reflect.ValueOf(p.Right()).IsNil() || p.Right() == lastVisit {
 			if !f(p) {
 				return

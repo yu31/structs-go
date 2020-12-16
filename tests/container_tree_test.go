@@ -6,8 +6,8 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/yu31/gostructs/bs"
 	"github.com/yu31/gostructs/container"
+	"github.com/yu31/gostructs/internal/tree"
 )
 
 func TestContainerTree_Root(t *testing.T) {
@@ -35,7 +35,7 @@ func TestContainerTree_LDR(t *testing.T) {
 		}
 
 		var r1 []container.Element
-		bs.LDR(tr.Root(), func(n container.TreeNode) bool {
+		tree.LDR(tr.Root(), func(n container.TreeNode) bool {
 			r1 = append(r1, n)
 			return true
 		})
@@ -71,7 +71,7 @@ func TestContainerTree_DLR(t *testing.T) {
 		}
 
 		var r1 []container.Element
-		bs.DLR(tr.Root(), func(n container.TreeNode) bool {
+		tree.DLR(tr.Root(), func(n container.TreeNode) bool {
 			r1 = append(r1, n)
 			return true
 		})
@@ -107,7 +107,7 @@ func TestContainerTree_LRD(t *testing.T) {
 		}
 
 		var r1 []container.Element
-		bs.LRD(tr.Root(), func(n container.TreeNode) bool {
+		tree.LRD(tr.Root(), func(n container.TreeNode) bool {
 			r1 = append(r1, n)
 			return true
 		})
