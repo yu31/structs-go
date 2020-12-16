@@ -7,7 +7,6 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/yu31/gostructs/bs"
 	"github.com/yu31/gostructs/container"
 )
 
@@ -68,7 +67,7 @@ func checkBalance(t *testing.T, n *treeNode) {
 
 func Test_Interface(t *testing.T) {
 	// Ensure the interface is implemented.
-	var node bs.TreeNode
+	var node container.TreeNode
 	var element container.Element
 
 	node = &treeNode{}

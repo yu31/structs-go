@@ -20,7 +20,7 @@ type Element interface {
 	Value() Value
 }
 
-// Container defines an data container interface.
+// Container declares an data container interface.
 type Container interface {
 	// Len returns the number of elements.
 	Len() int

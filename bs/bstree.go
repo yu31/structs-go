@@ -9,9 +9,15 @@ import (
 	"github.com/yu31/gostructs/container"
 )
 
+// Type aliases for simplifying use in this package.
+type Key = container.Key
+type Value = container.Value
+type Element = container.Element
+type TreeNode = container.TreeNode
+
 // treeNode is used for Binary Search Tree.
 //
-// And it is also the implementation of interface container.Element and bs.TreeNode
+// And it is also the implementation of interface container.Element and container.TreeNode
 type treeNode struct {
 	key   Key
 	value Value

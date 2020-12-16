@@ -98,7 +98,7 @@ func TestContainer_Delete(t *testing.T) {
 			require.NotNil(t, ele)
 			require.Equal(t, ele.Key(), k)
 			require.Equal(t, ele.Value(), v)
-			if n, ok := ele.(bs.TreeNode); ok {
+			if n, ok := ele.(container.TreeNode); ok {
 				require.Nil(t, n.Left())
 				require.Nil(t, n.Right())
 			}
@@ -186,7 +186,7 @@ func TestContainer_Update(t *testing.T) {
 			require.Equal(t, ele.Key(), k)
 			require.Equal(t, ele.Value(), v)
 
-			if n, ok := ele.(bs.TreeNode); ok {
+			if n, ok := ele.(container.TreeNode); ok {
 				require.Nil(t, n.Left())
 				require.Nil(t, n.Right())
 			}
@@ -244,7 +244,7 @@ func TestContainer_Replace(t *testing.T) {
 			require.Equal(t, ele.Key(), k)
 			require.Equal(t, ele.Value(), v, "key: %v", k)
 
-			if n, ok := ele.(bs.TreeNode); ok {
+			if n, ok := ele.(container.TreeNode); ok {
 				require.Nil(t, n.Left())
 				require.Nil(t, n.Right())
 			}
