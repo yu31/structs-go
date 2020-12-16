@@ -11,12 +11,13 @@ import (
 	"github.com/yu31/gostructs/stack"
 )
 
-// SearchRange to get the data for the specified range.
+// Range calls f sequentially each TreeNode present in the Tree.
+// If f returns false, range stops the iteration.
 //
-// Range interval: ( start <= x < boundary ).
+// Range interval: start <= x < boundary .
 // We will return data from the beginning if start is nil,
 // And return data util the end if boundary is nil.
-func SearchRange(root TreeNode, start Key, boundary Key, f func(n TreeNode)) {
+func Range(root TreeNode, start Key, boundary Key, f func(node TreeNode) bool) {
 	if root == nil {
 		return
 	}
@@ -39,13 +40,16 @@ func SearchRange(root TreeNode, start Key, boundary Key, f func(n TreeNode)) {
 			n := s.Pop().(TreeNode)
 			p = n.Right()
 
-			f(n)
+			// Stop iteration if return false.
+			if !f(n) {
+				return
+			}
 		}
 	}
 }
 
-// SearchLastLT search for the last node that less than the key.
-func SearchLastLT(root TreeNode, key Key) TreeNode {
+// LastLT searches for the last node that less than the key.
+func LastLT(root TreeNode, key Key) TreeNode {
 	if root == nil || key == nil {
 		return nil
 	}
@@ -66,8 +70,8 @@ func SearchLastLT(root TreeNode, key Key) TreeNode {
 	return n
 }
 
-// SearchLastLE search for the last node that less than or equal to the key.
-func SearchLastLE(root TreeNode, key Key) TreeNode {
+// LastLE search for the last node that less than or equal to the key.
+func LastLE(root TreeNode, key Key) TreeNode {
 	if root == nil || key == nil {
 		return nil
 	}
@@ -91,8 +95,8 @@ func SearchLastLE(root TreeNode, key Key) TreeNode {
 	return n
 }
 
-// SearchFirstGT search for the first node that greater than to the key.
-func SearchFirstGT(root TreeNode, key Key) TreeNode {
+// FirstGT search for the first node that greater than to the key.
+func FirstGT(root TreeNode, key Key) TreeNode {
 	if root == nil || key == nil {
 		return nil
 	}
@@ -113,8 +117,8 @@ func SearchFirstGT(root TreeNode, key Key) TreeNode {
 	return n
 }
 
-// SearchFirstGE search for the first node that greater than or equal to the key.
-func SearchFirstGE(root TreeNode, key Key) TreeNode {
+// FirstGE search for the first node that greater than or equal to the key.
+func FirstGE(root TreeNode, key Key) TreeNode {
 	if root == nil || key == nil {
 		return nil
 	}

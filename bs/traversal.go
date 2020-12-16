@@ -11,9 +11,10 @@ import (
 	"github.com/yu31/gostructs/stack"
 )
 
-// LDR return node by in-order traversal.
+// LDR calls f sequentially each TreeNode by in-order traversal.
+// If f returns false, range stops the iteration.
 // The order: Left -> Middle -> Right.
-func LDR(root TreeNode, f func(n TreeNode)) {
+func LDR(root TreeNode, f func(node TreeNode) bool) {
 	if root == nil {
 		return
 	}
@@ -29,14 +30,17 @@ func LDR(root TreeNode, f func(n TreeNode)) {
 			n := s.Pop().(TreeNode)
 			p = n.Right()
 
-			f(n)
+			if !f(n) {
+				return
+			}
 		}
 	}
 }
 
-// DLR return node by pre-order traversal.
+// DLR calls f sequentially each TreeNode by pre-order traversal.
+// If f returns false, range stops the iteration.
 // The order: Middle -> Left -> Right.
-func DLR(root TreeNode, f func(n TreeNode)) {
+func DLR(root TreeNode, f func(node TreeNode) bool) {
 	if root == nil {
 		return
 	}
@@ -46,7 +50,9 @@ func DLR(root TreeNode, f func(n TreeNode)) {
 
 	for !s.Empty() || (p != nil && !reflect.ValueOf(p).IsNil()) {
 		if !reflect.ValueOf(p).IsNil() {
-			f(p)
+			if !f(p) {
+				return
+			}
 
 			s.Push(p)
 			p = p.Left()
@@ -57,9 +63,10 @@ func DLR(root TreeNode, f func(n TreeNode)) {
 	}
 }
 
-// LRD return node by post-order traversal.
+// LRD calls f sequentially each TreeNode by post-order traversal.
+// If f returns false, range stops the iteration.
 // The order: Left -> Right -> Middle.
-func LRD(root TreeNode, f func(n TreeNode)) {
+func LRD(root TreeNode, f func(node TreeNode) bool) {
 	if root == nil {
 		return
 	}
@@ -77,7 +84,9 @@ func LRD(root TreeNode, f func(n TreeNode)) {
 	for !s.Empty() {
 		p = s.Pop().(TreeNode)
 		if reflect.ValueOf(p.Right()).IsNil() || p.Right() == lastVisit {
-			f(p)
+			if !f(p) {
+				return
+			}
 
 			lastVisit = p
 		} else {

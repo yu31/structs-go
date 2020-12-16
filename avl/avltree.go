@@ -213,14 +213,14 @@ func (tr *Tree) insertBalance(r0 *treeNode, k Key, v Value) (root *treeNode, nod
 
 	root = r0
 
-	cmp := k.Compare(r0.key)
+	cmp := k.Compare(root.key)
 	if cmp == 0 {
-		node = r0
+		node = root
 		return
 	}
 
 	// search the parent node
-	parent = r0
+	parent = root
 	if parent.left != nil && k.Compare(parent.left.key) == 0 {
 		// Found the key
 		node = parent.left

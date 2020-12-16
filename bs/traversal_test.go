@@ -33,8 +33,9 @@ func TestLDR(t *testing.T) {
 	tr := buildBSTree()
 
 	var r1 []Element
-	LDR(tr.root, func(n TreeNode) {
+	LDR(tr.root, func(n TreeNode) bool {
 		r1 = append(r1, n)
+		return true
 	})
 
 	var f func(node *treeNode)
@@ -56,8 +57,9 @@ func TestDLR(t *testing.T) {
 	tr := buildBSTree()
 
 	var r1 []Element
-	DLR(tr.root, func(n TreeNode) {
+	DLR(tr.root, func(n TreeNode) bool {
 		r1 = append(r1, n)
+		return true
 	})
 
 	var f func(node *treeNode)
@@ -79,8 +81,9 @@ func TestLRD(t *testing.T) {
 	tr := buildBSTree()
 
 	var r1 []Element
-	LRD(tr.root, func(n TreeNode) {
+	LRD(tr.root, func(n TreeNode) bool {
 		r1 = append(r1, n)
+		return true
 	})
 
 	var f func(node *treeNode)
