@@ -68,13 +68,12 @@ func (sl *List) Len() int {
 // Insert inserts and returns an Element with the given key and value.
 // Returns nil if key already exists.
 func (sl *List) Insert(k Key, v Value) Element {
-	var updates [maxLevel + 1]*listNode
-
 	level := sl.chooseLevel()
 	if level > sl.level {
 		sl.level = level
 	}
 
+	updates := make([]*listNode, sl.level+1)
 	p := sl.head
 	for i := sl.level; i >= 0; i-- {
 		for p.next[i] != nil && p.next[i].key.Compare(k) == -1 {
@@ -87,14 +86,13 @@ func (sl *List) Insert(k Key, v Value) Element {
 		updates[i] = p
 	}
 
-	node := sl.createNode(k, v, level)
+	n := sl.createNode(k, v, level)
 	for i := 0; i <= level; i++ {
-		node.next[i] = updates[i].next[i]
-		updates[i].next[i] = node
+		n.next[i] = updates[i].next[i]
+		updates[i].next[i] = n
 		sl.lens[i]++
 	}
-
-	return node
+	return n
 }
 
 // Delete removes and returns the Element of a given key.
@@ -102,7 +100,6 @@ func (sl *List) Insert(k Key, v Value) Element {
 func (sl *List) Delete(k Key) Element {
 	var d *listNode
 	p := sl.head
-
 	for i := sl.level; i >= 0; i-- {
 		for p.next[i] != nil && p.next[i].key.Compare(k) == -1 {
 			p = p.next[i]
@@ -119,28 +116,108 @@ func (sl *List) Delete(k Key) Element {
 			sl.level--
 		}
 	}
-
 	if d == nil {
 		return nil
 	}
-
+	// reset the unused field.
 	d.next = nil
-
 	return d
 }
 
-// Update updates and returns an Element with the given key and value.
-// Returns nil if key not found.
+// Update updates an Element with the given key and value, And returns the old element.
+// Returns nil if the key not be found.
 func (sl *List) Update(k Key, v Value) Element {
-	panic("not implemented")
+	var n *listNode
+
+	updates := make([]*listNode, sl.level+1)
+	p := sl.head
+	for i := sl.level; i >= 0; i-- {
+		for p.next[i] != nil && p.next[i].key.Compare(k) == -1 {
+			p = p.next[i]
+		}
+		if p.next[i] != nil && p.next[i].key.Compare(k) == 0 {
+			n = p.next[i]
+		}
+		updates[i] = p
+
+	}
+	if n == nil {
+		return nil
+	}
+
+	// creates a new node and instead of the old node.
+	n0 := &listNode{
+		key:   k,
+		value: v,
+		next:  n.next,
+	}
+
+	for i := 0; i < len(updates); i++ {
+		if updates[i] != nil && updates[i].next[i] == n {
+			updates[i].next[i] = n0
+		}
+	}
+
+	// reset the unused field.
+	n.next = nil
+	return n
 }
 
 // Replace inserts or updates an Element by giving key and value.
 //
-// The action are same as an Insert method if key not found,
-// And are same as an Update method if found the key.
+// The action are same as the Insert method if key not found,
+// And are same as the Update method if key exists.
 func (sl *List) Replace(k Key, v Value) Element {
-	panic("not implemented")
+	var n *listNode
+
+	updates := make([]*listNode, maxLevel+1)
+	p := sl.head
+	for i := sl.level; i >= 0; i-- {
+		for p.next[i] != nil && p.next[i].key.Compare(k) == -1 {
+			p = p.next[i]
+		}
+		if p.next[i] != nil && p.next[i].key.Compare(k) == 0 {
+			n = p.next[i]
+		}
+		updates[i] = p
+
+	}
+
+	if n == nil {
+		// The key not found, creates and inserts a newly node.
+		level := sl.chooseLevel()
+		if level > sl.level {
+			for i := level; i > sl.level; i-- {
+				updates[i] = sl.head
+			}
+			sl.level = level
+		}
+
+		n = sl.createNode(k, v, level)
+		for i := 0; i <= level; i++ {
+			n.next[i] = updates[i].next[i]
+			updates[i].next[i] = n
+			sl.lens[i]++
+		}
+		return n
+	}
+
+	// creates a new node and instead of the old node.
+	n0 := &listNode{
+		key:   k,
+		value: v,
+		next:  n.next,
+	}
+
+	for i := 0; i < len(updates); i++ {
+		if updates[i] != nil && updates[i].next[i] == n {
+			updates[i].next[i] = n0
+		}
+	}
+
+	// reset the unused field.
+	n.next = nil
+	return n
 }
 
 // Search searches the Element of a given key.

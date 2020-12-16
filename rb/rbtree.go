@@ -78,53 +78,17 @@ func (tr *Tree) Len() int {
 // Insert inserts and returns an Element with the given key and value.
 // Returns nil if key already exists.
 func (tr *Tree) Insert(k Key, v Value) Element {
-	var n *treeNode
-	p := tr.root
-	for p != nil {
-		flag := k.Compare(p.key)
-		if flag == -1 {
-			if p.left == nil {
-				n = tr.createNode(k, v, p)
-				p.left = n
-				break
-			}
-			p = p.left
-		} else if flag == 1 {
-			if p.right == nil {
-				n = tr.createNode(k, v, p)
-				p.right = n
-				break
-			}
-			p = p.right
-		} else {
-			// The key already exists. Not allowed duplicates.
-			return nil
-		}
+	n, ok := tr.insert(k, v)
+	if !ok {
+		return nil
 	}
-	if n == nil {
-		n = tr.createNode(k, v, p)
-	}
-
-	tr.insertBalance(n)
-	tr.len++
-
 	return n
 }
 
 // Delete removes and returns the Element of a given key.
 // Returns nil if not found.
 func (tr *Tree) Delete(k Key) Element {
-	d := tr.root
-	for d != nil {
-		flag := k.Compare(d.key)
-		if flag == -1 {
-			d = d.left
-		} else if flag == 1 {
-			d = d.right
-		} else {
-			break
-		}
-	}
+	d := tr.search(k)
 	if d == nil {
 		return nil
 	}
@@ -145,7 +109,6 @@ func (tr *Tree) Delete(k Key) Element {
 	} else {
 		c = d.right
 	}
-
 	if c != nil {
 		c.parent = d.parent
 	}
@@ -162,6 +125,7 @@ func (tr *Tree) Delete(k Key) Element {
 		tr.deleteBalance(c, d.parent)
 	}
 
+	// reset the unused field.
 	d.left = nil
 	d.right = nil
 	d.parent = nil
@@ -171,40 +135,122 @@ func (tr *Tree) Delete(k Key) Element {
 	return d
 }
 
-// Update updates and returns an Element with the given key and value.
-// Returns nil if key not found.
+// Update updates an Element with the given key and value, And returns the old element.
+// Returns nil if the key not be found.
 func (tr *Tree) Update(k Key, v Value) Element {
-	panic("not implemented")
+	n := tr.search(k)
+	if n != nil {
+		tr.update(n, k, v)
+	}
+	return n
 }
 
 // Replace inserts or updates an Element by giving key and value.
 //
-// The action are same as an Insert method if key not found,
-// And are same as an Update method if found the key.
+// The action are same as the Insert method if key not found,
+// And are same as the Update method if key exists.
 func (tr *Tree) Replace(k Key, v Value) Element {
-	panic("not implemented")
+	n, ok := tr.insert(k, v)
+	if !ok {
+		tr.update(n, k, v)
+	}
+	return n
 }
 
 // Search searches the Element of a given key.
 // Returns nil if key not found.
 func (tr *Tree) Search(k Key) Element {
+	return tr.search(k)
+}
+
+// Iter return an Iterator, it's a wrap for bs.Iterator.
+func (tr *Tree) Iter(start Key, boundary Key) container.Iterator {
+	return bs.NewIterator(tr.root, start, boundary)
+}
+
+// Insert inserts and returns an Element with the given key and value.
+// Returns nil if key already exists.
+func (tr *Tree) insert(k Key, v Value) (n *treeNode, ok bool) {
+	n = tr.root
+	for n != nil {
+		cmp := k.Compare(n.key)
+		if cmp == 0 {
+			// The key already exists, returns it.
+			return
+		}
+
+		if cmp == -1 {
+			if n.left == nil {
+				n.left = tr.createNode(k, v, n)
+				n = n.left
+				break
+			}
+			n = n.left
+		} else {
+			if n.right == nil {
+				n.right = tr.createNode(k, v, n)
+				n = n.right
+				break
+			}
+			n = n.right
+		}
+	}
+
+	if n == nil {
+		n = tr.createNode(k, v, nil)
+	}
+
+	tr.insertBalance(n)
+	tr.len++
+	ok = true
+	return
+}
+
+// Help ot creates a newly node and instead of the node n.
+func (tr *Tree) update(n *treeNode, k Key, v Value) {
+	p := n.parent
+
+	n0 := tr.createNode(k, v, p)
+	n0.left = n.left
+	n0.right = n.right
+	n0.color = n.color
+
+	if n.left != nil {
+		n.left.parent = n0
+	}
+	if n.right != nil {
+		n.right.parent = n0
+	}
+
+	if p == nil {
+		tr.root = n0
+	} else if p.left == n {
+		p.left = n0
+	} else {
+		p.right = n0
+	}
+
+	// reset the unused field.
+	n.left = nil
+	n.right = nil
+	n.parent = nil
+	n.color = -1
+}
+
+// Search the node of a given key.
+func (tr *Tree) search(k Key) *treeNode {
 	p := tr.root
 	for p != nil {
-		flag := k.Compare(p.key)
-		if flag == -1 {
+		cmp := k.Compare(p.key)
+		if cmp == -1 {
 			p = p.left
-		} else if flag == 1 {
+		} else if cmp == 1 {
 			p = p.right
 		} else {
 			return p
 		}
 	}
 	return nil
-}
-
-// Iter return an Iterator, it's a wrap for bs.Iterator.
-func (tr *Tree) Iter(start Key, boundary Key) container.Iterator {
-	return bs.NewIterator(tr.root, start, boundary)
 }
 
 func (tr *Tree) swap(n1, n2 *treeNode) {

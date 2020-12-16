@@ -54,8 +54,8 @@ func SearchLastLT(root TreeNode, key Key) TreeNode {
 
 	p := root
 	for p != nil && !reflect.ValueOf(p).IsNil() {
-		flag := key.Compare(p.Key())
-		if flag == 1 {
+		cmp := key.Compare(p.Key())
+		if cmp == 1 {
 			n = p
 			p = p.Right()
 		} else {
@@ -76,11 +76,11 @@ func SearchLastLE(root TreeNode, key Key) TreeNode {
 
 	p := root
 	for p != nil && !reflect.ValueOf(p).IsNil() {
-		flag := key.Compare(p.Key())
-		if flag == 1 {
+		cmp := key.Compare(p.Key())
+		if cmp == 1 {
 			n = p
 			p = p.Right()
-		} else if flag == -1 {
+		} else if cmp == -1 {
 			p = p.Left()
 		} else {
 			n = p
@@ -101,8 +101,8 @@ func SearchFirstGT(root TreeNode, key Key) TreeNode {
 
 	p := root
 	for p != nil && !reflect.ValueOf(p).IsNil() {
-		flag := key.Compare(p.Key())
-		if flag == -1 {
+		cmp := key.Compare(p.Key())
+		if cmp == -1 {
 			n = p
 			p = p.Left()
 		} else {
@@ -123,11 +123,11 @@ func SearchFirstGE(root TreeNode, key Key) TreeNode {
 
 	p := root
 	for p != nil && !reflect.ValueOf(p).IsNil() {
-		flag := key.Compare(p.Key())
-		if flag == -1 {
+		cmp := key.Compare(p.Key())
+		if cmp == -1 {
 			n = p
 			p = p.Left()
-		} else if flag == 1 {
+		} else if cmp == 1 {
 			p = p.Right()
 		} else {
 			n = p

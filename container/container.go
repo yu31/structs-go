@@ -28,7 +28,6 @@ type Container interface {
 	// Insert inserts and returns an Element with the given key and value.
 	// Returns nil if key already exists.
 	//
-	// NOTICE: This method should not allow inserts with an exists key.
 	// You can use the Replace method if the action you expect is "insert or update".
 	Insert(k Key, v Value) Element
 
@@ -36,17 +35,16 @@ type Container interface {
 	// Returns nil if key not found.
 	Delete(k Key) Element
 
-	// Update updates and returns an Element with the given key and value.
-	// Returns nil if key not found.
+	// Update updates an Element with the given key and value, And returns the old element.
+	// Returns nil if the key not be found.
 	//
-	// NOTICE: This method should not allow updates with an not exist key.
 	// You can use the Replace method if the action you expect is "insert or update".
 	Update(k Key, v Value) Element
 
 	// Replace inserts or updates an Element by giving key and value.
 	//
-	// The action are same as an Insert method if key not found,
-	// And are same as an Update method if found the key.
+	// The action are same as the Insert method if key not found,
+	// And are same as the Update method if key exists.
 	Replace(k Key, v Value) Element
 
 	// Search searches the Element of a given key.

@@ -64,61 +64,17 @@ func (tr *Tree) Len() int {
 // Insert inserts and returns an Element with the given key and value.
 // Returns nil if key already exists.
 func (tr *Tree) Insert(k Key, v Value) Element {
-	var n *treeNode
-	p := tr.root
-	for p != nil {
-		flag := k.Compare(p.key)
-		if flag == -1 {
-			if p.left == nil {
-				n = tr.createNode(k, v)
-				p.left = n
-				break
-			}
-			p = p.left
-		} else if flag == 1 {
-			if p.right == nil {
-				n = tr.createNode(k, v)
-				p.right = n
-				break
-			}
-			p = p.right
-		} else {
-			// The key already exists. Not allowed duplicates.
-			return nil
-		}
+	_, n, ok := tr.insert(k, v)
+	if !ok {
+		return nil
 	}
-
-	if p == nil {
-		n = tr.createNode(k, v)
-		tr.root = n
-	}
-
-	tr.len++
 	return n
 }
 
 // Delete removes and returns the Element of a given key.
 // Returns nil if not found.
 func (tr *Tree) Delete(k Key) Element {
-	var dd *treeNode
-	d := tr.root
-
-	for d != nil {
-		flag := k.Compare(d.key)
-		// Found the deletion key
-		if flag == 0 {
-			break
-		}
-
-		dd = d
-		if flag == -1 {
-			d = d.left
-		} else {
-			d = d.right
-		}
-	}
-
-	// Not found.
+	dd, d := tr.search(k)
 	if d == nil {
 		return nil
 	}
@@ -151,6 +107,7 @@ func (tr *Tree) Delete(k Key) Element {
 		dd.right = c
 	}
 
+	// reset the unused field.
 	d.left = nil
 	d.right = nil
 
@@ -158,40 +115,120 @@ func (tr *Tree) Delete(k Key) Element {
 	return d
 }
 
-// Update updates and returns an Element with the given key and value.
-// Returns nil if key not found.
+// Update updates an Element with the given key and value, And returns the old element.
+// Returns nil if the key not be found.
 func (tr *Tree) Update(k Key, v Value) Element {
-	panic("not implemented")
+	p, n := tr.search(k)
+	if n != nil {
+		tr.update(n, p, k, v)
+	}
+	return n
 }
 
 // Replace inserts or updates an Element by giving key and value.
 //
-// The action are same as an Insert method if key not found,
-// And are same as an Update method if found the key.
+// The action are same as the Insert method if key not found,
+// And are same as the Update method if key exists.
 func (tr *Tree) Replace(k Key, v Value) Element {
-	panic("not implemented")
+	p, n, ok := tr.insert(k, v)
+	if !ok {
+		tr.update(n, p, k, v)
+	}
+	return n
 }
 
 // Search searches the Element of a given key.
 // Returns nil if key not found.
 func (tr *Tree) Search(k Key) Element {
-	p := tr.root
-	for p != nil {
-		flag := k.Compare(p.key)
-		if flag == -1 {
-			p = p.left
-		} else if flag == 1 {
-			p = p.right
-		} else {
-			return p
-		}
-	}
-	return nil
+	_, n := tr.search(k)
+	return n
 }
 
 // Iter return an Iterator, it's a wrap for bs.Iterator.
 func (tr *Tree) Iter(start Key, boundary Key) container.Iterator {
 	return NewIterator(tr.root, start, boundary)
+}
+
+// Try to creates and inserts a node with the key and value.
+//
+// If the key not exists, it will creates and returns a newly node n, and ok is true.
+// If the key already exists, n is the node where key is, and ok is false.
+func (tr *Tree) insert(k Key, v Value) (p *treeNode, n *treeNode, ok bool) {
+	n = tr.root
+	for n != nil {
+		cmp := k.Compare(n.key)
+		if cmp == 0 {
+			// The key already exists, returns it.
+			return
+		}
+
+		p = n // The parent node of n.
+
+		if cmp == -1 {
+			if n.left == nil {
+				n.left = tr.createNode(k, v)
+				n = n.left
+				break
+			}
+			n = n.left
+		} else {
+			if n.right == nil {
+				n.right = tr.createNode(k, v)
+				n = n.right
+				break
+			}
+			n = n.right
+		}
+	}
+
+	if n == nil {
+		n = tr.createNode(k, v)
+		tr.root = n
+	}
+
+	ok = true
+	tr.len++
+	return
+}
+
+// Help ot creates a newly node and instead of the node n.
+func (tr *Tree) update(n *treeNode, p *treeNode, k Key, v Value) {
+	n0 := tr.createNode(k, v)
+	n0.left = n.left
+	n0.right = n.right
+
+	if p == nil {
+		tr.root = n0
+	} else if p.left == n {
+		p.left = n0
+	} else {
+		p.right = n0
+	}
+
+	// reset the unused field.
+	n.left = nil
+	n.right = nil
+}
+
+// Searches the node and its parent node of a given key.
+func (tr *Tree) search(k Key) (p *treeNode, n *treeNode) {
+	n = tr.root
+	for n != nil {
+		cmp := k.Compare(n.key)
+		if cmp == 0 {
+			// Found the node of key.
+			return
+		}
+
+		p = n // The parent node of n.
+
+		if cmp == -1 {
+			n = n.left
+		} else {
+			n = n.right
+		}
+	}
+	return
 }
 
 func (tr *Tree) createNode(k Key, v Value) *treeNode {
