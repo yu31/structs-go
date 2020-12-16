@@ -127,7 +127,7 @@ func (sl *List) Delete(k Key) Element {
 // Update updates an Element with the given key and value, And returns the old element.
 // Returns nil if the key not be found.
 func (sl *List) Update(k Key, v Value) Element {
-	var n *listNode
+	var node *listNode
 
 	updates := make([]*listNode, sl.level+1)
 	p := sl.head
@@ -136,12 +136,12 @@ func (sl *List) Update(k Key, v Value) Element {
 			p = p.next[i]
 		}
 		if p.next[i] != nil && p.next[i].key.Compare(k) == 0 {
-			n = p.next[i]
+			node = p.next[i]
 		}
 		updates[i] = p
 
 	}
-	if n == nil {
+	if node == nil {
 		return nil
 	}
 
@@ -149,18 +149,18 @@ func (sl *List) Update(k Key, v Value) Element {
 	n0 := &listNode{
 		key:   k,
 		value: v,
-		next:  n.next,
+		next:  node.next,
 	}
 
 	for i := 0; i < len(updates); i++ {
-		if updates[i] != nil && updates[i].next[i] == n {
+		if updates[i] != nil && updates[i].next[i] == node {
 			updates[i].next[i] = n0
 		}
 	}
 
 	// reset the unused field.
-	n.next = nil
-	return n
+	node.next = nil
+	return node
 }
 
 // Replace inserts or updates an Element by giving key and value.
@@ -168,7 +168,7 @@ func (sl *List) Update(k Key, v Value) Element {
 // The action are same as the Insert method if key not found,
 // And are same as the Update method if key exists.
 func (sl *List) Replace(k Key, v Value) Element {
-	var n *listNode
+	var node *listNode
 
 	updates := make([]*listNode, maxLevel+1)
 	p := sl.head
@@ -177,13 +177,12 @@ func (sl *List) Replace(k Key, v Value) Element {
 			p = p.next[i]
 		}
 		if p.next[i] != nil && p.next[i].key.Compare(k) == 0 {
-			n = p.next[i]
+			node = p.next[i]
 		}
 		updates[i] = p
-
 	}
 
-	if n == nil {
+	if node == nil {
 		// The key not found, creates and inserts a newly node.
 		level := sl.chooseLevel()
 		if level > sl.level {
@@ -193,31 +192,31 @@ func (sl *List) Replace(k Key, v Value) Element {
 			sl.level = level
 		}
 
-		n = sl.createNode(k, v, level)
+		node = sl.createNode(k, v, level)
 		for i := 0; i <= level; i++ {
-			n.next[i] = updates[i].next[i]
-			updates[i].next[i] = n
+			node.next[i] = updates[i].next[i]
+			updates[i].next[i] = node
 			sl.lens[i]++
 		}
-		return n
+		return node
 	}
 
 	// creates a new node and instead of the old node.
 	n0 := &listNode{
 		key:   k,
 		value: v,
-		next:  n.next,
+		next:  node.next,
 	}
 
 	for i := 0; i < len(updates); i++ {
-		if updates[i] != nil && updates[i].next[i] == n {
+		if updates[i] != nil && updates[i].next[i] == node {
 			updates[i].next[i] = n0
 		}
 	}
 
 	// reset the unused field.
-	n.next = nil
-	return n
+	node.next = nil
+	return node
 }
 
 // Search searches the Element of a given key.

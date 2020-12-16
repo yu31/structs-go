@@ -63,11 +63,10 @@ type Tree struct {
 
 // New creates an Red-Black Tree.
 func New() *Tree {
-	tr := &Tree{
+	return &Tree{
 		root: nil,
 		len:  0,
 	}
-	return tr
 }
 
 // Len return number of elements.
@@ -78,11 +77,11 @@ func (tr *Tree) Len() int {
 // Insert inserts and returns an Element with the given key and value.
 // Returns nil if key already exists.
 func (tr *Tree) Insert(k Key, v Value) Element {
-	n, ok := tr.insert(k, v)
+	node, ok := tr.insertOrSearch(k, v)
 	if !ok {
 		return nil
 	}
-	return n
+	return node
 }
 
 // Delete removes and returns the Element of a given key.
@@ -138,11 +137,11 @@ func (tr *Tree) Delete(k Key) Element {
 // Update updates an Element with the given key and value, And returns the old element.
 // Returns nil if the key not be found.
 func (tr *Tree) Update(k Key, v Value) Element {
-	n := tr.search(k)
-	if n != nil {
-		tr.update(n, k, v)
+	node := tr.search(k)
+	if node != nil {
+		tr.update(node, k, v)
 	}
-	return n
+	return node
 }
 
 // Replace inserts or updates an Element by giving key and value.
@@ -150,7 +149,7 @@ func (tr *Tree) Update(k Key, v Value) Element {
 // The action are same as the Insert method if key not found,
 // And are same as the Update method if key exists.
 func (tr *Tree) Replace(k Key, v Value) Element {
-	n, ok := tr.insert(k, v)
+	n, ok := tr.insertOrSearch(k, v)
 	if !ok {
 		tr.update(n, k, v)
 	}
@@ -168,89 +167,90 @@ func (tr *Tree) Iter(start Key, boundary Key) container.Iterator {
 	return bs.NewIterator(tr.root, start, boundary)
 }
 
-// Insert inserts and returns an Element with the given key and value.
-// Returns nil if key already exists.
-func (tr *Tree) insert(k Key, v Value) (n *treeNode, ok bool) {
-	n = tr.root
-	for n != nil {
-		cmp := k.Compare(n.key)
+// The insertOrSearch inserts and returns a newly node with the given key and value.
+// Or else, returns the exists node for the key if present.
+// The ok result is true if the node was inserted, false if searched.
+func (tr *Tree) insertOrSearch(k Key, v Value) (node *treeNode, ok bool) {
+	node = tr.root
+	for node != nil {
+		cmp := k.Compare(node.key)
 		if cmp == 0 {
 			// The key already exists, returns it.
 			return
 		}
 
 		if cmp == -1 {
-			if n.left == nil {
-				n.left = tr.createNode(k, v, n)
-				n = n.left
+			if node.left == nil {
+				node.left = tr.createNode(k, v, node)
+				node = node.left
 				break
 			}
-			n = n.left
+			node = node.left
 		} else {
-			if n.right == nil {
-				n.right = tr.createNode(k, v, n)
-				n = n.right
+			if node.right == nil {
+				node.right = tr.createNode(k, v, node)
+				node = node.right
 				break
 			}
-			n = n.right
+			node = node.right
 		}
 	}
 
-	if n == nil {
-		n = tr.createNode(k, v, nil)
+	if node == nil {
+		node = tr.createNode(k, v, nil)
 	}
 
-	tr.insertBalance(n)
+	tr.insertBalance(node)
 	tr.len++
 	ok = true
 	return
 }
 
 // Help ot creates a newly node and instead of the node n.
-func (tr *Tree) update(n *treeNode, k Key, v Value) {
-	p := n.parent
+func (tr *Tree) update(node *treeNode, k Key, v Value) {
+	p := node.parent
 
 	n0 := tr.createNode(k, v, p)
-	n0.left = n.left
-	n0.right = n.right
-	n0.color = n.color
+	n0.left = node.left
+	n0.right = node.right
+	n0.color = node.color
 
-	if n.left != nil {
-		n.left.parent = n0
+	if node.left != nil {
+		node.left.parent = n0
 	}
-	if n.right != nil {
-		n.right.parent = n0
+	if node.right != nil {
+		node.right.parent = n0
 	}
 
 	if p == nil {
 		tr.root = n0
-	} else if p.left == n {
+	} else if p.left == node {
 		p.left = n0
 	} else {
 		p.right = n0
 	}
 
 	// reset the unused field.
-	n.left = nil
-	n.right = nil
-	n.parent = nil
-	n.color = -1
+	node.left = nil
+	node.right = nil
+	node.parent = nil
+	node.color = -1
 }
 
 // Search the node of a given key.
-func (tr *Tree) search(k Key) *treeNode {
-	p := tr.root
-	for p != nil {
-		cmp := k.Compare(p.key)
+func (tr *Tree) search(k Key) (node *treeNode) {
+	node = tr.root
+	for node != nil {
+		cmp := k.Compare(node.key)
 		if cmp == -1 {
-			p = p.left
+			node = node.left
 		} else if cmp == 1 {
-			p = p.right
+			node = node.right
 		} else {
-			return p
+			return
 		}
 	}
-	return nil
+	return
 }
 
 func (tr *Tree) swap(n1, n2 *treeNode) {
@@ -258,7 +258,8 @@ func (tr *Tree) swap(n1, n2 *treeNode) {
 	n1.value, n2.value = n2.value, n1.value
 }
 
-func (tr *Tree) insertBalance(n *treeNode) {
+func (tr *Tree) insertBalance(node *treeNode) {
+	n := node
 	if n.parent == nil {
 		n.color = black
 		tr.root = n
@@ -308,12 +309,13 @@ func (tr *Tree) insertBalance(n *treeNode) {
 	}
 }
 
-func (tr *Tree) deleteBalance(n *treeNode, p *treeNode) {
+func (tr *Tree) deleteBalance(node *treeNode, parent *treeNode) {
+	n := node
+	p := parent
 	if n != nil && n.color == red {
 		n.color = black
 		return
 	}
-
 	if p == nil {
 		tr.root = n
 		return
@@ -385,42 +387,42 @@ func (tr *Tree) createNode(k Key, v Value, p *treeNode) *treeNode {
 	}
 }
 
-func (tr *Tree) leftRotate(n *treeNode) {
-	r := n.right
+func (tr *Tree) leftRotate(node *treeNode) {
+	r := node.right
 	if r.left != nil {
-		r.left.parent = n
+		r.left.parent = node
 	}
 
-	n.right = r.left
-	r.left = n
+	node.right = r.left
+	r.left = node
 
-	r.parent = n.parent
-	n.parent = r
+	r.parent = node.parent
+	node.parent = r
 
 	if r.parent == nil {
 		tr.root = r
-	} else if r.parent.left == n {
+	} else if r.parent.left == node {
 		r.parent.left = r
 	} else {
 		r.parent.right = r
 	}
 }
 
-func (tr *Tree) rightRotate(n *treeNode) {
-	l := n.left
+func (tr *Tree) rightRotate(node *treeNode) {
+	l := node.left
 	if l.right != nil {
-		l.right.parent = n
+		l.right.parent = node
 	}
 
-	n.left = l.right
-	l.right = n
+	node.left = l.right
+	l.right = node
 
-	l.parent = n.parent
-	n.parent = l
+	l.parent = node.parent
+	node.parent = l
 
 	if l.parent == nil {
 		tr.root = l
-	} else if l.parent.left == n {
+	} else if l.parent.left == node {
 		l.parent.left = l
 	} else {
 		l.parent.right = l

@@ -15,6 +15,25 @@ import (
 	"github.com/yu31/gostructs/skip"
 )
 
+var seeds map[container.Int]string
+
+func init() {
+	r := rand.New(rand.NewSource(time.Now().UnixNano()))
+	length := 1024
+	maxKey := length * 1000
+	seeds = make(map[container.Int]string, length)
+
+	for i := 0; i < length; i++ {
+		for {
+			k := container.Int(r.Intn(maxKey) + 1)
+			if _, ok := seeds[k]; !ok {
+				seeds[k] = strconv.Itoa(int(k*2 + 1))
+				break
+			}
+		}
+	}
+}
+
 func TestContainer_Interface(t *testing.T) {
 	// Ensure the bs/avl/rb/skip are implements the container.Container.
 	t.Run("container", func(t *testing.T) {
@@ -33,25 +52,6 @@ func TestContainer_Interface(t *testing.T) {
 
 		it = bs.NewIterator(nil, nil, nil)
 	})
-}
-
-var seeds map[container.Int]string
-
-func init() {
-	r := rand.New(rand.NewSource(time.Now().UnixNano()))
-	length := 1024
-	maxKey := length * 1000
-	seeds = make(map[container.Int]string, length)
-
-	for i := 0; i < length; i++ {
-		for {
-			k := container.Int(r.Intn(maxKey) + 1)
-			if _, ok := seeds[k]; !ok {
-				seeds[k] = strconv.Itoa(int(k*2 + 1))
-				break
-			}
-		}
-	}
 }
 
 func TestContainer_Insert(t *testing.T) {

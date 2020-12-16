@@ -49,11 +49,10 @@ type Tree struct {
 
 // New creates an Binary Search Tree.
 func New() *Tree {
-	tr := &Tree{
+	return &Tree{
 		root: nil,
 		len:  0,
 	}
-	return tr
 }
 
 // Len returns the number of elements.
@@ -64,11 +63,11 @@ func (tr *Tree) Len() int {
 // Insert inserts and returns an Element with the given key and value.
 // Returns nil if key already exists.
 func (tr *Tree) Insert(k Key, v Value) Element {
-	_, n, ok := tr.insert(k, v)
+	_, node, ok := tr.insertOrSearch(k, v)
 	if !ok {
 		return nil
 	}
-	return n
+	return node
 }
 
 // Delete removes and returns the Element of a given key.
@@ -118,11 +117,11 @@ func (tr *Tree) Delete(k Key) Element {
 // Update updates an Element with the given key and value, And returns the old element.
 // Returns nil if the key not be found.
 func (tr *Tree) Update(k Key, v Value) Element {
-	p, n := tr.search(k)
-	if n != nil {
-		tr.update(n, p, k, v)
+	parent, node := tr.search(k)
+	if node != nil {
+		tr.update(node, parent, k, v)
 	}
-	return n
+	return node
 }
 
 // Replace inserts or updates an Element by giving key and value.
@@ -130,11 +129,11 @@ func (tr *Tree) Update(k Key, v Value) Element {
 // The action are same as the Insert method if key not found,
 // And are same as the Update method if key exists.
 func (tr *Tree) Replace(k Key, v Value) Element {
-	p, n, ok := tr.insert(k, v)
+	parent, node, ok := tr.insertOrSearch(k, v)
 	if !ok {
-		tr.update(n, p, k, v)
+		tr.update(node, parent, k, v)
 	}
-	return n
+	return node
 }
 
 // Search searches the Element of a given key.
@@ -149,83 +148,82 @@ func (tr *Tree) Iter(start Key, boundary Key) container.Iterator {
 	return NewIterator(tr.root, start, boundary)
 }
 
-// Try to creates and inserts a node with the key and value.
-//
-// If the key not exists, it will creates and returns a newly node n, and ok is true.
-// If the key already exists, n is the node where key is, and ok is false.
-func (tr *Tree) insert(k Key, v Value) (p *treeNode, n *treeNode, ok bool) {
-	n = tr.root
-	for n != nil {
-		cmp := k.Compare(n.key)
+// The insertOrSearch inserts and returns a new node with the given key and value.
+// Or else, returns the exists node and its parent node for the key if present.
+// The ok result is true if the node was inserted, false if searched.
+func (tr *Tree) insertOrSearch(k Key, v Value) (parent *treeNode, node *treeNode, ok bool) {
+	node = tr.root
+	for node != nil {
+		cmp := k.Compare(node.key)
 		if cmp == 0 {
-			// The key already exists, returns it.
+			// Found the exists key, returns it
 			return
 		}
 
-		p = n // The parent node of n.
+		parent = node // The parent node of n.
 
 		if cmp == -1 {
-			if n.left == nil {
-				n.left = tr.createNode(k, v)
-				n = n.left
+			if node.left == nil {
+				node.left = tr.createNode(k, v)
+				node = node.left
 				break
 			}
-			n = n.left
+			node = node.left
 		} else {
-			if n.right == nil {
-				n.right = tr.createNode(k, v)
-				n = n.right
+			if node.right == nil {
+				node.right = tr.createNode(k, v)
+				node = node.right
 				break
 			}
-			n = n.right
+			node = node.right
 		}
 	}
 
-	if n == nil {
-		n = tr.createNode(k, v)
-		tr.root = n
+	if node == nil {
+		node = tr.createNode(k, v)
+		tr.root = node
 	}
 
-	ok = true
 	tr.len++
+	ok = true
 	return
 }
 
-// Help ot creates a newly node and instead of the node n.
-func (tr *Tree) update(n *treeNode, p *treeNode, k Key, v Value) {
+// Help ot creates a newly node and instead of the node.
+func (tr *Tree) update(node *treeNode, parent *treeNode, k Key, v Value) {
 	n0 := tr.createNode(k, v)
-	n0.left = n.left
-	n0.right = n.right
+	n0.left = node.left
+	n0.right = node.right
 
-	if p == nil {
+	if parent == nil {
 		tr.root = n0
-	} else if p.left == n {
-		p.left = n0
+	} else if parent.left == node {
+		parent.left = n0
 	} else {
-		p.right = n0
+		parent.right = n0
 	}
 
 	// reset the unused field.
-	n.left = nil
-	n.right = nil
+	node.left = nil
+	node.right = nil
 }
 
 // Searches the node and its parent node of a given key.
-func (tr *Tree) search(k Key) (p *treeNode, n *treeNode) {
-	n = tr.root
-	for n != nil {
-		cmp := k.Compare(n.key)
+func (tr *Tree) search(k Key) (parent *treeNode, node *treeNode) {
+	node = tr.root
+	for node != nil {
+		cmp := k.Compare(node.key)
 		if cmp == 0 {
 			// Found the node of key.
 			return
 		}
 
-		p = n // The parent node of n.
+		parent = node // The parent node of n.
 
 		if cmp == -1 {
-			n = n.left
+			node = node.left
 		} else {
-			n = n.right
+			node = node.right
 		}
 	}
 	return

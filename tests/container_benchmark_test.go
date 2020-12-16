@@ -12,13 +12,9 @@ import (
 	"github.com/yu31/gostructs/skip"
 )
 
-var r *rand.Rand
-
-func init() {
-	r = rand.New(rand.NewSource(time.Now().UnixNano()))
-}
-
 func BenchmarkContainer_Insert(b *testing.B) {
+	r := rand.New(rand.NewSource(time.Now().UnixNano()))
+
 	process := func(b *testing.B, box container.Container) {
 		b.ResetTimer()
 		for i := 0; i < b.N; i++ {
@@ -41,6 +37,8 @@ func BenchmarkContainer_Insert(b *testing.B) {
 }
 
 func BenchmarkContainer_Search(b *testing.B) {
+	r := rand.New(rand.NewSource(time.Now().UnixNano()))
+
 	process := func(b *testing.B, box container.Container) {
 		for i := 0; i < b.N; i++ {
 			box.Insert(container.Int64(r.Int63()), nil)
@@ -66,6 +64,8 @@ func BenchmarkContainer_Search(b *testing.B) {
 }
 
 func BenchmarkContainer_Delete(b *testing.B) {
+	r := rand.New(rand.NewSource(time.Now().UnixNano()))
+
 	process := func(b *testing.B, box container.Container) {
 		for i := 0; i < b.N; i++ {
 			box.Insert(container.Int64(r.Int63()), nil)

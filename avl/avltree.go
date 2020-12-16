@@ -59,11 +59,10 @@ type Tree struct {
 
 // New creates an AVL Tree.
 func New() *Tree {
-	tr := &Tree{
+	return &Tree{
 		root: nil,
 		len:  0,
 	}
-	return tr
 }
 
 // Len returns the number of elements.
@@ -74,18 +73,18 @@ func (tr *Tree) Len() int {
 // Insert inserts and returns an Element with the given key and value.
 // Returns nil if key already exists.
 func (tr *Tree) Insert(k Key, v Value) Element {
-	_, n, ok := tr.insert(k, v)
+	_, node, ok := tr.insertOrSearch(k, v)
 	if !ok {
 		return nil
 	}
-	return n
+	return node
 }
 
 // Delete removes and returns the Element of a given key.
 // Returns nil if not found.
 func (tr *Tree) Delete(k Key) Element {
 	var d *treeNode
-	tr.root, d = tr.delete(tr.root, k)
+	tr.root, d = tr.deleteBalance(tr.root, k)
 	if d == nil {
 		return nil
 	}
@@ -102,11 +101,11 @@ func (tr *Tree) Delete(k Key) Element {
 // Update updates an Element with the given key and value, And returns the old element.
 // Returns nil if the key not be found.
 func (tr *Tree) Update(k Key, v Value) Element {
-	p, n := tr.search(k)
-	if n != nil {
-		tr.update(n, p, k, v)
+	parent, node := tr.search(k)
+	if node != nil {
+		tr.update(node, parent, k, v)
 	}
-	return n
+	return node
 }
 
 // Replace inserts or updates an Element by giving key and value.
@@ -114,11 +113,11 @@ func (tr *Tree) Update(k Key, v Value) Element {
 // The action are same as the Insert method if key not found,
 // And are same as the Update method if key exists.
 func (tr *Tree) Replace(k Key, v Value) Element {
-	p, n, ok := tr.insert(k, v)
+	parent, node, ok := tr.insertOrSearch(k, v)
 	if !ok {
-		tr.update(n, p, k, v)
+		tr.update(node, parent, k, v)
 	}
-	return n
+	return node
 }
 
 // Search searches the Element of a given key.
@@ -133,12 +132,11 @@ func (tr *Tree) Iter(start Key, boundary Key) container.Iterator {
 	return bs.NewIterator(tr.root, start, boundary)
 }
 
-// Try to creates and inserts a node with the key and value.
-//
-// If the key not exists, it will creates and returns a newly node n, and ok is true.
-// If the key already exists, n is the node where key is, and ok is false.
-func (tr *Tree) insert(k Key, v Value) (p *treeNode, n *treeNode, ok bool) {
-	tr.root, p, n, ok = tr.insertBalance(tr.root, k, v)
+// The insertOrSearch inserts and returns a newly node with the given key and value.
+// Or else, returns the exists node and its parent node for the key if present.
+// The ok result is true if the node was inserted, false if searched.
+func (tr *Tree) insertOrSearch(k Key, v Value) (parent *treeNode, node *treeNode, ok bool) {
+	tr.root, parent, node, ok = tr.insertBalance(tr.root, k, v)
 	if !ok {
 		return
 	}
@@ -147,42 +145,42 @@ func (tr *Tree) insert(k Key, v Value) (p *treeNode, n *treeNode, ok bool) {
 }
 
 // Help ot creates a newly node and instead of the node n.
-func (tr *Tree) update(n *treeNode, p *treeNode, k Key, v Value) {
+func (tr *Tree) update(node *treeNode, parent *treeNode, k Key, v Value) {
 	n0 := tr.createNode(k, v)
-	n0.left = n.left
-	n0.right = n.right
-	n0.height = n.height
+	n0.left = node.left
+	n0.right = node.right
+	n0.height = node.height
 
-	if p == nil {
+	if parent == nil {
 		tr.root = n0
-	} else if p.left == n {
-		p.left = n0
+	} else if parent.left == node {
+		parent.left = n0
 	} else {
-		p.right = n0
+		parent.right = n0
 	}
 
 	// reset the unused field.
-	n.left = nil
-	n.right = nil
-	n.height = -1
+	node.left = nil
+	node.right = nil
+	node.height = -1
 }
 
 // Searches the node and its parent node of a given key.
-func (tr *Tree) search(k Key) (p *treeNode, n *treeNode) {
-	n = tr.root
-	for n != nil {
-		cmp := k.Compare(n.key)
+func (tr *Tree) search(k Key) (parent *treeNode, node *treeNode) {
+	node = tr.root
+	for node != nil {
+		cmp := k.Compare(node.key)
 		if cmp == 0 {
 			// Found the node of key.
 			return
 		}
 
-		p = n // The parent node of n.
+		parent = node // The parent node of n.
 
 		if cmp == -1 {
-			n = n.left
+			node = node.left
 		} else {
-			n = n.right
+			node = node.right
 		}
 	}
 	return
@@ -193,127 +191,122 @@ func (tr *Tree) swap(n1, n2 *treeNode) {
 	n1.value, n2.value = n2.value, n1.value
 }
 
-// return (root root, new node)
 // ok is false means no newly node created.
-func (tr *Tree) insertBalance(r0 *treeNode, k Key, v Value) (root *treeNode, p *treeNode, n *treeNode, ok bool) {
-	root = r0
+func (tr *Tree) insertBalance(r0 *treeNode, k Key, v Value) (root *treeNode, parent *treeNode, node *treeNode, ok bool) {
 	if r0 == nil {
-		n = tr.createNode(k, v)
-		root = n
-		p = nil
+		node = tr.createNode(k, v)
+		root = node
+		parent = nil
 		ok = true
 		return
 	}
 
+	root = r0
+
 	cmp := k.Compare(r0.key)
 	if cmp == 0 {
-		n = r0
+		node = r0
 		return
 	}
 
 	// search the parent node
-	p = r0
-	if p.left != nil && p.left.key.Compare(k) == 0 {
+	parent = r0
+	if parent.left != nil && k.Compare(parent.left.key) == 0 {
 		// Found the key
-		n = p.left
+		node = parent.left
 		return
 	}
-	if p.right != nil && p.right.key.Compare(k) == 0 {
+	if parent.right != nil && k.Compare(parent.right.key) == 0 {
 		// Found the key
-		n = p.right
+		node = parent.right
 		return
 	}
 
 	if cmp == -1 {
 		// Insert into the left subtree.
-		root.left, p, n, ok = tr.insertBalance(root.left, k, v)
+		root.left, parent, node, ok = tr.insertBalance(root.left, k, v)
 	} else {
 		// Insert into the right subtree
-		root.right, p, n, ok = tr.insertBalance(root.right, k, v)
+		root.right, parent, node, ok = tr.insertBalance(root.right, k, v)
 	}
 
 	if ok {
 		root = tr.reBalance(root)
 	}
-
 	return
 }
 
 // return (root root, delete node).
-func (tr *Tree) delete(root *treeNode, k Key) (*treeNode, *treeNode) {
-	var d *treeNode
+func (tr *Tree) deleteBalance(r0 *treeNode, k Key) (root *treeNode, d *treeNode) {
+	root = r0
 	if root == nil {
-		// not found
-		return nil, nil
+		// The key not exists.
+		return
+	}
+
+	cmp := k.Compare(root.key)
+	if cmp == -1 {
+		// delete from the left subtree.
+		root.left, d = tr.deleteBalance(root.left, k)
+	} else if cmp == 1 {
+		// delete from the right subtree.
+		root.right, d = tr.deleteBalance(root.right, k)
 	} else {
-		cmp := k.Compare(root.key)
-		if cmp == -1 {
-			// delete from the left subtree.
-			root.left, d = tr.delete(root.left, k)
-		} else if cmp == 1 {
-			// delete from the right subtree.
-			root.right, d = tr.delete(root.right, k)
-		} else {
-			if root.left != nil && root.right != nil {
-				if tr.nodeHeight(root.left) > tr.nodeHeight(root.right) {
-					x := root.left
-					for x.right != nil {
-						x = x.right
-					}
-					tr.swap(root, x)
-					root.left, d = tr.delete(root.left, k)
-				} else {
-					x := root.right
-					for x.left != nil {
-						x = x.left
-					}
-					tr.swap(root, x)
-					root.right, d = tr.delete(root.right, k)
+		if root.left != nil && root.right != nil {
+			if tr.nodeHeight(root.left) > tr.nodeHeight(root.right) {
+				x := root.left
+				for x.right != nil {
+					x = x.right
 				}
+				tr.swap(root, x)
+				root.left, d = tr.deleteBalance(root.left, k)
 			} else {
-				d = root
-				if d.left != nil {
-					root = d.left
-				} else {
-					root = d.right
+				x := root.right
+				for x.left != nil {
+					x = x.left
 				}
+				tr.swap(root, x)
+				root.right, d = tr.deleteBalance(root.right, k)
 			}
-		}
-		if root != nil {
-			root = tr.reBalance(root)
+		} else {
+			d = root
+			if d.left != nil {
+				root = d.left
+			} else {
+				root = d.right
+			}
 		}
 	}
 
-	return root, d
+	root = tr.reBalance(root)
+	return
 }
 
-func (tr *Tree) reBalance(n *treeNode) *treeNode {
-	if n == nil {
+func (tr *Tree) reBalance(node *treeNode) *treeNode {
+	if node == nil {
 		return nil
 	}
 
-	factor := tr.nodeHeight(n.left) - tr.nodeHeight(n.right)
-
+	factor := tr.nodeHeight(node.left) - tr.nodeHeight(node.right)
 	switch factor {
 	case -1, 0, 1:
-		n.height = tr.calculateHeight(n)
+		node.height = tr.calculateHeight(node)
 	case 2:
 		// Left subtree higher than right subtree.
-		if tr.nodeHeight(n.left.right) > tr.nodeHeight(n.left.left) {
-			n.left = tr.leftRotate(n.left)
+		if tr.nodeHeight(node.left.right) > tr.nodeHeight(node.left.left) {
+			node.left = tr.leftRotate(node.left)
 		}
-		n = tr.rightRotate(n)
+		node = tr.rightRotate(node)
 	case -2:
 		// Left subtree lower than right subtree.
-		if tr.nodeHeight(n.right.left) > tr.nodeHeight(n.right.right) {
-			n.right = tr.rightRotate(n.right)
+		if tr.nodeHeight(node.right.left) > tr.nodeHeight(node.right.right) {
+			node.right = tr.rightRotate(node.right)
 		}
-		n = tr.leftRotate(n)
+		node = tr.leftRotate(node)
 	default:
 		panic(fmt.Errorf("avl: unexpected cases with invalid factor <%d>", factor))
 	}
-
-	return n
+	return node
 }
 
 func (tr *Tree) createNode(k Key, v Value) *treeNode {
@@ -326,42 +319,40 @@ func (tr *Tree) createNode(k Key, v Value) *treeNode {
 	}
 }
 
-func (tr *Tree) nodeHeight(n *treeNode) int {
-	if n == nil {
+func (tr *Tree) nodeHeight(node *treeNode) int {
+	if node == nil {
 		return 0
 	}
-	return n.height
+	return node.height
 }
 
-func (tr *Tree) calculateHeight(n *treeNode) int {
-	lh := tr.nodeHeight(n.left)
-	rh := tr.nodeHeight(n.right)
+func (tr *Tree) calculateHeight(node *treeNode) int {
+	lh := tr.nodeHeight(node.left)
+	rh := tr.nodeHeight(node.right)
 	if lh > rh {
 		return lh + 1
 	}
 	return rh + 1
 }
 
-func (tr *Tree) leftRotate(n *treeNode) *treeNode {
-	r := n.right
+func (tr *Tree) leftRotate(node *treeNode) *treeNode {
+	r := node.right
 
-	n.right = r.left
-	r.left = n
+	node.right = r.left
+	r.left = node
 
-	n.height = tr.calculateHeight(n)
+	node.height = tr.calculateHeight(node)
 	r.height = tr.calculateHeight(r)
-
 	return r
 }
 
-func (tr *Tree) rightRotate(n *treeNode) *treeNode {
-	l := n.left
+func (tr *Tree) rightRotate(node *treeNode) *treeNode {
+	l := node.left
 
-	n.left = l.right
-	l.right = n
+	node.left = l.right
+	l.right = node
 
-	n.height = tr.calculateHeight(n)
+	node.height = tr.calculateHeight(node)
 	l.height = tr.calculateHeight(l)
-
 	return l
 }
