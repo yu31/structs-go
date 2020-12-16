@@ -13,9 +13,9 @@ import (
 )
 
 // Type aliases for simplifying use in this package.
-type Key = container.Key
-type Value = container.Value
-type Element = container.Element
+//type Key = container.Key
+//type Value = container.Value
+//type Element = container.Element
 
 const (
 	maxLevel = 0x1f
@@ -25,18 +25,18 @@ const (
 //
 // And it is also the implementation of interface container.Element.
 type listNode struct {
-	key   Key
-	value Value
+	key   container.Key
+	value container.Value
 	next  []*listNode
 }
 
 // Key returns the key.
-func (n *listNode) Key() Key {
+func (n *listNode) Key() container.Key {
 	return n.key
 }
 
 // Value returns the value.
-func (n *listNode) Value() Value {
+func (n *listNode) Value() container.Value {
 	return n.value
 }
 
@@ -68,7 +68,7 @@ func (sl *List) Len() int {
 // Insert inserts and returns an Element with given key and value if key doesn't exists.
 // Or else, returns the existing Element for the key if present.
 // The bool result is true if an Element was inserted, false if searched.
-func (sl *List) Insert(k Key, v Value) (Element, bool) {
+func (sl *List) Insert(k container.Key, v container.Value) (container.Element, bool) {
 	level := sl.chooseLevel()
 	if level > sl.level {
 		sl.level = level
@@ -98,7 +98,7 @@ func (sl *List) Insert(k Key, v Value) (Element, bool) {
 
 // Delete removes and returns the Element of a given key.
 // Returns nil if not found.
-func (sl *List) Delete(k Key) Element {
+func (sl *List) Delete(k container.Key) container.Element {
 	var d *listNode
 	p := sl.head
 	for i := sl.level; i >= 0; i-- {
@@ -127,7 +127,7 @@ func (sl *List) Delete(k Key) Element {
 
 // Update updates an Element with the given key and value, And returns the old element.
 // Returns nil if the key not be found.
-func (sl *List) Update(k Key, v Value) Element {
+func (sl *List) Update(k container.Key, v container.Value) container.Element {
 	var node *listNode
 
 	updates := make([]*listNode, sl.level+1)
@@ -169,7 +169,7 @@ func (sl *List) Update(k Key, v Value) Element {
 //
 // The operation are same as the Insert method if key not found,
 // And are same as the Update method if key exists.
-func (sl *List) Replace(k Key, v Value) (Element, bool) {
+func (sl *List) Replace(k container.Key, v container.Value) (container.Element, bool) {
 	var node *listNode
 
 	updates := make([]*listNode, maxLevel+1)
@@ -223,7 +223,7 @@ func (sl *List) Replace(k Key, v Value) (Element, bool) {
 
 // Search searches the Element of a given key.
 // Returns nil if key not found.
-func (sl *List) Search(k Key) Element {
+func (sl *List) Search(k container.Key) container.Element {
 	p := sl.head
 	for i := sl.level; i >= 0; i-- {
 		for p.next[i] != nil && p.next[i].key.Compare(k) == -1 {
@@ -237,13 +237,13 @@ func (sl *List) Search(k Key) Element {
 }
 
 // Iter return an Iterator, it's a wrap for skip.Iterator
-func (sl *List) Iter(start Key, boundary Key) container.Iterator {
+func (sl *List) Iter(start container.Key, boundary container.Key) container.Iterator {
 	return newIterator(sl, start, boundary)
 }
 
 // Range calls f sequentially each TreeNode present in the Tree.
 // If f returns false, range stops the iteration.
-func (sl *List) Range(start Key, boundary Key, f func(ele Element) bool) {
+func (sl *List) Range(start container.Key, boundary container.Key, f func(ele container.Element) bool) {
 	var node *listNode
 	var end *listNode
 
@@ -270,26 +270,26 @@ func (sl *List) Range(start Key, boundary Key, f func(ele Element) bool) {
 }
 
 // LastLT searches for the last node that less than the key.
-func (sl *List) LastLT(k Key) Element {
+func (sl *List) LastLT(k container.Key) container.Element {
 	return sl.searchLastLT(k)
 }
 
 // LastLE search for the last node that less than or equal to the key.
-func (sl *List) LastLE(k Key) Element {
+func (sl *List) LastLE(k container.Key) container.Element {
 	return sl.searchLastLE(k)
 }
 
 // FirstGT search for the first node that greater than to the key.
-func (sl *List) FirstGT(k Key) Element {
+func (sl *List) FirstGT(k container.Key) container.Element {
 	return sl.searchFirstGT(k)
 }
 
 // FirstGE search for the first node that greater than or equal to the key.
-func (sl *List) FirstGE(k Key) Element {
+func (sl *List) FirstGE(k container.Key) container.Element {
 	return sl.searchFirstGE(k)
 }
 
-func (sl *List) createNode(k Key, v Value, level int) *listNode {
+func (sl *List) createNode(k container.Key, v container.Value, level int) *listNode {
 	return &listNode{
 		key:   k,
 		value: v,
@@ -306,7 +306,7 @@ func (sl *List) chooseLevel() int {
 }
 
 // Search the last node that less than the key.
-func (sl *List) searchLastLT(k Key) *listNode {
+func (sl *List) searchLastLT(k container.Key) *listNode {
 	p := sl.head
 	for i := sl.level; i >= 0; i-- {
 		for p.next[i] != nil && p.next[i].key.Compare(k) == -1 {
@@ -321,7 +321,7 @@ func (sl *List) searchLastLT(k Key) *listNode {
 }
 
 // Search the last node that less than or equal to the key.
-func (sl *List) searchLastLE(k Key) *listNode {
+func (sl *List) searchLastLE(k container.Key) *listNode {
 	p := sl.head
 	for i := sl.level; i >= 0; i-- {
 		for p.next[i] != nil && p.next[i].key.Compare(k) == -1 {
@@ -339,7 +339,7 @@ func (sl *List) searchLastLE(k Key) *listNode {
 }
 
 // Search the first node that greater than to the key.
-func (sl *List) searchFirstGT(k Key) *listNode {
+func (sl *List) searchFirstGT(k container.Key) *listNode {
 	p := sl.head
 	for i := sl.level; i >= 0; i-- {
 		for p.next[i] != nil && p.next[i].key.Compare(k) == -1 {
@@ -360,7 +360,7 @@ func (sl *List) searchFirstGT(k Key) *listNode {
 }
 
 // Search the first node that greater than or equal to the key.
-func (sl *List) searchFirstGE(k Key) *listNode {
+func (sl *List) searchFirstGE(k container.Key) *listNode {
 	p := sl.head
 	for i := sl.level; i >= 0; i-- {
 		for p.next[i] != nil && p.next[i].key.Compare(k) == -1 {

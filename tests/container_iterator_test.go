@@ -12,10 +12,10 @@ func TestContainer_Iterator(t *testing.T) {
 	// --------- order in container: [22, 24, 35, 61, 64, 67, 76, 84, 87, 91, 97, 130, 133, 145, 150] ---------
 	seeds := []container.Int64{22, 24, 35, 61, 64, 67, 76, 84, 87, 91, 97, 130, 133, 145, 150}
 
-	process := func(t *testing.T, box container.Container) {
+	process := func(t *testing.T, ctr container.Container) {
 		// Insert seeds in random order
 		for _, k := range shuffleSeeds(seeds) {
-			box.Insert(k, int64(k*2+1))
+			ctr.Insert(k, int64(k*2+1))
 		}
 
 		var iter container.Iterator
@@ -23,7 +23,7 @@ func TestContainer_Iterator(t *testing.T) {
 
 		// Test case: start == nil and boundary == nil
 		t.Run("case1", func(t *testing.T) {
-			iter = box.Iter(nil, nil)
+			iter = ctr.Iter(nil, nil)
 			require.NotNil(t, iter)
 			require.True(t, iter.Valid())
 			for i := 0; i < len(seeds); i++ {
@@ -40,7 +40,7 @@ func TestContainer_Iterator(t *testing.T) {
 		// Test case: start != nil && boundary == nil
 		t.Run("case2", func(t *testing.T) {
 			// start < first node
-			iter = box.Iter(container.Int64(21), nil)
+			iter = ctr.Iter(container.Int64(21), nil)
 			require.NotNil(t, iter)
 			require.True(t, iter.Valid())
 			for i := 0; i < len(seeds); i++ {
@@ -54,7 +54,7 @@ func TestContainer_Iterator(t *testing.T) {
 			require.False(t, iter.Valid())
 
 			// start == first node
-			iter = box.Iter(container.Int64(22), nil)
+			iter = ctr.Iter(container.Int64(22), nil)
 			require.NotNil(t, iter)
 			require.True(t, iter.Valid())
 			for i := 0; i < len(seeds); i++ {
@@ -68,7 +68,7 @@ func TestContainer_Iterator(t *testing.T) {
 			require.False(t, iter.Valid())
 
 			// start > first node && start < last node
-			iter = box.Iter(container.Int64(27), nil)
+			iter = ctr.Iter(container.Int64(27), nil)
 			require.NotNil(t, iter)
 			require.True(t, iter.Valid())
 			for i := 2; i < len(seeds); i++ {
@@ -82,7 +82,7 @@ func TestContainer_Iterator(t *testing.T) {
 			require.False(t, iter.Valid())
 
 			// start > first node && start < last node
-			iter = box.Iter(container.Int64(62), nil)
+			iter = ctr.Iter(container.Int64(62), nil)
 			require.NotNil(t, iter)
 			require.True(t, iter.Valid())
 			for i := 4; i < len(seeds); i++ {
@@ -96,7 +96,7 @@ func TestContainer_Iterator(t *testing.T) {
 			require.False(t, iter.Valid())
 
 			// start > root node && start < last node
-			iter = box.Iter(container.Int64(132), nil)
+			iter = ctr.Iter(container.Int64(132), nil)
 			require.NotNil(t, iter)
 			require.True(t, iter.Valid())
 			for i := 12; i < len(seeds); i++ {
@@ -110,7 +110,7 @@ func TestContainer_Iterator(t *testing.T) {
 			require.False(t, iter.Valid())
 
 			// start == last node
-			iter = box.Iter(container.Int64(150), nil)
+			iter = ctr.Iter(container.Int64(150), nil)
 			require.NotNil(t, iter)
 			require.True(t, iter.Valid())
 			element = iter.Next()
@@ -120,7 +120,7 @@ func TestContainer_Iterator(t *testing.T) {
 			require.False(t, iter.Valid())
 
 			// start > last node
-			iter = box.Iter(container.Int64(156), nil)
+			iter = ctr.Iter(container.Int64(156), nil)
 			require.NotNil(t, iter)
 			element = iter.Next()
 			require.Nil(t, element)
@@ -130,21 +130,21 @@ func TestContainer_Iterator(t *testing.T) {
 		// Test case: start == nil && boundary != nil
 		t.Run("case3", func(t *testing.T) {
 			// boundary < first node
-			iter = box.Iter(nil, container.Int64(21))
+			iter = ctr.Iter(nil, container.Int64(21))
 			require.NotNil(t, iter)
 			require.False(t, iter.Valid())
 			element = iter.Next()
 			require.Nil(t, element)
 
 			// boundary == first node
-			iter = box.Iter(nil, container.Int64(22))
+			iter = ctr.Iter(nil, container.Int64(22))
 			require.NotNil(t, iter)
 			require.False(t, iter.Valid())
 			element = iter.Next()
 			require.Nil(t, element)
 
 			// boundary > first node
-			iter = box.Iter(nil, container.Int64(24))
+			iter = ctr.Iter(nil, container.Int64(24))
 			require.NotNil(t, iter)
 			require.True(t, iter.Valid())
 			element = iter.Next()
@@ -154,7 +154,7 @@ func TestContainer_Iterator(t *testing.T) {
 			require.False(t, iter.Valid())
 
 			// boundary < last node && bound > first node
-			iter = box.Iter(nil, container.Int64(147))
+			iter = ctr.Iter(nil, container.Int64(147))
 			require.NotNil(t, iter)
 			require.True(t, iter.Valid())
 			for i := 0; i < len(seeds)-1; i++ {
@@ -168,7 +168,7 @@ func TestContainer_Iterator(t *testing.T) {
 			require.False(t, iter.Valid())
 
 			// boundary == last node
-			iter = box.Iter(nil, container.Int64(150))
+			iter = ctr.Iter(nil, container.Int64(150))
 			require.NotNil(t, iter)
 			require.True(t, iter.Valid())
 			for i := 0; i < len(seeds)-1; i++ {
@@ -182,7 +182,7 @@ func TestContainer_Iterator(t *testing.T) {
 			require.False(t, iter.Valid())
 
 			// boundary > last node
-			iter = box.Iter(nil, container.Int64(156))
+			iter = ctr.Iter(nil, container.Int64(156))
 			require.NotNil(t, iter)
 			require.True(t, iter.Valid())
 			for i := range seeds {
@@ -199,7 +199,7 @@ func TestContainer_Iterator(t *testing.T) {
 		// Test case: start != nil && boundary != nil
 		t.Run("case4", func(t *testing.T) {
 			// start < boundary && start > first node && bound < last node
-			iter = box.Iter(container.Int64(68), container.Int64(132))
+			iter = ctr.Iter(container.Int64(68), container.Int64(132))
 			require.NotNil(t, iter)
 			require.True(t, iter.Valid())
 			for i := 6; i < len(seeds)-3; i++ {
@@ -213,7 +213,7 @@ func TestContainer_Iterator(t *testing.T) {
 			require.False(t, iter.Valid())
 
 			// start < boundary && start < first node && bound > last node
-			iter = box.Iter(container.Int64(21), container.Int64(153))
+			iter = ctr.Iter(container.Int64(21), container.Int64(153))
 			require.NotNil(t, iter)
 			require.True(t, iter.Valid())
 			for i := 0; i < len(seeds); i++ {
@@ -227,28 +227,28 @@ func TestContainer_Iterator(t *testing.T) {
 			require.False(t, iter.Valid())
 
 			// start == boundary, start and boundary exists.
-			iter = box.Iter(container.Int64(24), container.Int64(24))
+			iter = ctr.Iter(container.Int64(24), container.Int64(24))
 			require.NotNil(t, iter)
 			element = iter.Next()
 			require.Nil(t, element)
 			require.False(t, iter.Valid())
 
 			// start == boundary, start and boundary not exists.
-			iter = box.Iter(container.Int64(25), container.Int64(25))
+			iter = ctr.Iter(container.Int64(25), container.Int64(25))
 			require.NotNil(t, iter)
 			element = iter.Next()
 			require.Nil(t, element)
 			require.False(t, iter.Valid())
 
 			// start < boundary && start < first node && bound < first node
-			iter = box.Iter(container.Int64(21), container.Int64(13))
+			iter = ctr.Iter(container.Int64(21), container.Int64(13))
 			require.NotNil(t, iter)
 			element = iter.Next()
 			require.Nil(t, element)
 			require.False(t, iter.Valid())
 
 			// start > boundary && start > first node
-			iter = box.Iter(container.Int64(65), container.Int64(27))
+			iter = ctr.Iter(container.Int64(65), container.Int64(27))
 			require.NotNil(t, iter)
 			element = iter.Next()
 			require.Nil(t, element)

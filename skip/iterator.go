@@ -5,6 +5,8 @@
 
 package skip
 
+import "github.com/yu31/gostructs/container"
+
 // Iterator to iteration return element.
 //
 // The element range is start <= x < boundary.
@@ -18,7 +20,7 @@ type Iterator struct {
 }
 
 // creates an Iterator.
-func newIterator(sl *List, start Key, boundary Key) *Iterator {
+func newIterator(sl *List, start container.Key, boundary container.Key) *Iterator {
 	var node, end *listNode
 
 	// If both the start and boundary are not nil, the start should less than the boundary.
@@ -51,7 +53,7 @@ func (iter *Iterator) Valid() bool {
 
 // Next returns a Element and moved the iterator to the next Element.
 // Returns nil if no more elements.
-func (iter *Iterator) Next() Element {
+func (iter *Iterator) Next() container.Element {
 	if !iter.Valid() {
 		return nil
 	}

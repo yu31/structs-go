@@ -10,6 +10,26 @@ import (
 	"github.com/yu31/gostructs/container"
 )
 
+// Iteration with recursion.
+func rangeRecursion(root *treeNode, start container.Key, boundary container.Key, f func(node *treeNode) bool) {
+	if root == nil {
+		return
+	}
+
+	if start != nil && root.key.Compare(start) == -1 {
+		rangeRecursion(root.right, start, boundary, f)
+	} else if boundary != nil && root.key.Compare(boundary) != -1 {
+		rangeRecursion(root.left, start, boundary, f)
+	} else {
+		// start <= node <= boundary
+		rangeRecursion(root.left, start, boundary, f)
+		if !f(root) {
+			return
+		}
+		rangeRecursion(root.right, start, boundary, f)
+	}
+}
+
 func checkCorrect(t *testing.T, n *treeNode) {
 	if n == nil {
 		return
@@ -30,6 +50,7 @@ func TestNew(t *testing.T) {
 	require.NotNil(t, tr)
 	require.Nil(t, tr.root)
 	require.Equal(t, tr.Len(), 0)
+	_ = rangeRecursion
 }
 
 func TestTree_createNode(t *testing.T) {

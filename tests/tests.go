@@ -51,20 +51,20 @@ func shuffleSeeds(s1 []container.Int64) []container.Int64 {
 	return s2
 }
 
-func searchRange(box container.Container, start container.Key, boundary container.Key) []container.Element {
+func searchRange(ctr container.Container, start container.Key, boundary container.Key) []container.Element {
 	var result []container.Element
 
-	box.Range(start, boundary, func(ele container.Element) bool {
+	ctr.Range(start, boundary, func(ele container.Element) bool {
 		result = append(result, ele)
 		return true
 	})
 	return result
 }
 
-func searchRangeByIter(box container.Container, start container.Key, boundary container.Key) []container.Element {
+func searchRangeByIter(ctr container.Container, start container.Key, boundary container.Key) []container.Element {
 	var result []container.Element
 
-	it := box.Iter(start, boundary)
+	it := ctr.Iter(start, boundary)
 	for it.Valid() {
 		n := it.Next()
 		result = append(result, n)

@@ -38,13 +38,13 @@ func init() {
 func TestContainer_Interface(t *testing.T) {
 	// Ensure the bs/avl/rb/skip are implements the container.Container.
 	t.Run("container", func(t *testing.T) {
-		var box container.Container
-		_ = box
+		var ctr container.Container
+		_ = ctr
 
-		box = bs.New()
-		box = avl.New()
-		box = rb.New()
-		box = skip.New()
+		ctr = bs.New()
+		ctr = avl.New()
+		ctr = rb.New()
+		ctr = skip.New()
 	})
 
 	t.Run("iterator", func(t *testing.T) {
@@ -54,27 +54,27 @@ func TestContainer_Interface(t *testing.T) {
 	})
 
 	t.Run("tree", func(t *testing.T) {
-		var box container.Tree
-		_ = box
+		var ctr container.Tree
+		_ = ctr
 
-		box = bs.New()
-		box = avl.New()
-		box = rb.New()
+		ctr = bs.New()
+		ctr = avl.New()
+		ctr = rb.New()
 	})
 }
 
 func TestContainer_Insert(t *testing.T) {
-	process := func(box container.Container) {
+	process := func(ctr container.Container) {
 		for k, v := range seeds {
 			// The key not exists before, Insert was creates an new Element.
-			ele, ok := box.Insert(k, v)
+			ele, ok := ctr.Insert(k, v)
 			require.True(t, ok)
 			require.NotNil(t, ele)
 			require.Equal(t, ele.Key(), k)
 			require.Equal(t, ele.Value(), v)
 
 			// The key already exists, Insert was return the present Element.
-			ele, ok = box.Insert(k, v+v)
+			ele, ok = ctr.Insert(k, v+v)
 			require.False(t, ok)
 			require.NotNil(t, ele)
 			require.Equal(t, ele.Key(), k)
@@ -83,7 +83,7 @@ func TestContainer_Insert(t *testing.T) {
 
 		// Insert a exists key again.
 		for k, v := range seeds {
-			ele, ok := box.Insert(k, v+v)
+			ele, ok := ctr.Insert(k, v+v)
 			require.False(t, ok)
 			require.NotNil(t, ele)
 			require.Equal(t, ele.Key(), k)
@@ -100,16 +100,16 @@ func TestContainer_Insert(t *testing.T) {
 }
 
 func TestContainer_Delete(t *testing.T) {
-	process := func(box container.Container) {
+	process := func(ctr container.Container) {
 		// Try to delete key not exists.
-		require.Nil(t, box.Delete(container.Int(0)))
+		require.Nil(t, ctr.Delete(container.Int(0)))
 
 		for k, v := range seeds {
-			box.Insert(k, v)
+			ctr.Insert(k, v)
 		}
 
 		for k, v := range seeds {
-			ele := box.Delete(k)
+			ele := ctr.Delete(k)
 			require.NotNil(t, ele)
 			require.Equal(t, ele.Key(), k)
 			require.Equal(t, ele.Value(), v)
@@ -117,11 +117,11 @@ func TestContainer_Delete(t *testing.T) {
 				require.Nil(t, n.Left())
 				require.Nil(t, n.Right())
 			}
-			require.Nil(t, box.Delete(k))
+			require.Nil(t, ctr.Delete(k))
 		}
 
 		for k := range seeds {
-			require.Nil(t, box.Delete(k))
+			require.Nil(t, ctr.Delete(k))
 		}
 	}
 
@@ -134,22 +134,22 @@ func TestContainer_Delete(t *testing.T) {
 }
 
 func TestContainer_Search(t *testing.T) {
-	process := func(box container.Container) {
+	process := func(ctr container.Container) {
 		// Try to search key not exists.
-		require.Nil(t, box.Search(container.Int(0)))
+		require.Nil(t, ctr.Search(container.Int(0)))
 
 		for k, v := range seeds {
-			require.Nil(t, box.Search(k))
-			box.Insert(k, v)
+			require.Nil(t, ctr.Search(k))
+			ctr.Insert(k, v)
 		}
 
 		for k, v := range seeds {
-			require.NotNil(t, box.Search(k))
-			box.Insert(k, v+v)
+			require.NotNil(t, ctr.Search(k))
+			ctr.Insert(k, v+v)
 		}
 
 		for k, v := range seeds {
-			ele := box.Search(k)
+			ele := ctr.Search(k)
 			require.NotNil(t, ele)
 			require.Equal(t, ele.Key(), k)
 			require.Equal(t, ele.Value(), v)
@@ -165,20 +165,20 @@ func TestContainer_Search(t *testing.T) {
 }
 
 func TestContainer_Update(t *testing.T) {
-	process := func(box container.Container) {
+	process := func(ctr container.Container) {
 		// The updated key not exists.
 		for k, v := range seeds {
-			require.Nil(t, box.Update(k, v+v))
-			require.Nil(t, box.Search(k))
+			require.Nil(t, ctr.Update(k, v+v))
+			require.Nil(t, ctr.Search(k))
 		}
 
 		// Insert data of seeds.
 		for k, v := range seeds {
-			_, ok := box.Insert(k, v)
+			_, ok := ctr.Insert(k, v)
 			require.True(t, ok)
 		}
 		for k, v := range seeds {
-			ele := box.Search(k)
+			ele := ctr.Search(k)
 			require.NotNil(t, ele)
 			require.Equal(t, ele.Key(), k)
 			require.Equal(t, ele.Value(), v)
@@ -186,7 +186,7 @@ func TestContainer_Update(t *testing.T) {
 
 		// Updated the value of key.
 		for k, v := range seeds {
-			ele := box.Update(k, v+v)
+			ele := ctr.Update(k, v+v)
 			require.NotNil(t, ele)
 			require.Equal(t, ele.Key(), k)
 			require.Equal(t, ele.Value(), v)
@@ -197,7 +197,7 @@ func TestContainer_Update(t *testing.T) {
 			}
 		}
 		for k, v := range seeds {
-			ele := box.Search(k)
+			ele := ctr.Search(k)
 			require.NotNil(t, ele)
 			require.Equal(t, ele.Key(), k)
 			require.Equal(t, ele.Value(), v+v)
@@ -213,11 +213,11 @@ func TestContainer_Update(t *testing.T) {
 }
 
 func TestContainer_Replace(t *testing.T) {
-	process := func(box container.Container) {
+	process := func(ctr container.Container) {
 		// The key not exists, Replace same as the Insert
 		for k, v := range seeds {
-			require.Nil(t, box.Search(k))
-			ele, ok := box.Replace(k, v)
+			require.Nil(t, ctr.Search(k))
+			ele, ok := ctr.Replace(k, v)
 			require.True(t, ok)
 			require.NotNil(t, ele)
 			require.Equal(t, ele.Key(), k)
@@ -225,22 +225,22 @@ func TestContainer_Replace(t *testing.T) {
 		}
 
 		for k, v := range seeds {
-			_, ok := box.Insert(k, v+v)
+			_, ok := ctr.Insert(k, v+v)
 			require.False(t, ok)
 		}
 
 		for k, v := range seeds {
-			ele := box.Search(k)
+			ele := ctr.Search(k)
 			require.NotNil(t, ele)
 			require.Equal(t, ele.Key(), k)
 			require.Equal(t, ele.Value(), v)
 		}
 
-		require.Equal(t, box.Len(), len(seeds))
+		require.Equal(t, ctr.Len(), len(seeds))
 
 		// The key already exists, Replace same as the Update.
 		for k, v := range seeds {
-			ele, ok := box.Replace(k, v+v)
+			ele, ok := ctr.Replace(k, v+v)
 			require.False(t, ok)
 			require.NotNil(t, ele)
 			require.Equal(t, ele.Key(), k)
@@ -252,7 +252,7 @@ func TestContainer_Replace(t *testing.T) {
 			}
 		}
 		for k, v := range seeds {
-			ele := box.Search(k)
+			ele := ctr.Search(k)
 			require.NotNil(t, ele)
 			require.Equal(t, ele.Key(), k)
 			require.Equal(t, ele.Value(), v+v)
@@ -268,76 +268,75 @@ func TestContainer_Replace(t *testing.T) {
 }
 
 func TestContainer_Len(t *testing.T) {
-	process := func(box container.Container) {
+	process := func(ctr container.Container) {
 		// Try to search key not exists.
-		require.Equal(t, box.Len(), 0)
+		require.Equal(t, ctr.Len(), 0)
 		var i int
-
 		i = 1
 		for k, v := range seeds {
-			box.Insert(k, v)
-			require.Equal(t, box.Len(), i)
+			ctr.Insert(k, v)
+			require.Equal(t, ctr.Len(), i)
 			// Insert duplicates.
-			box.Insert(k, v)
-			require.Equal(t, box.Len(), i)
+			ctr.Insert(k, v)
+			require.Equal(t, ctr.Len(), i)
 			i++
 		}
-		require.Equal(t, box.Len(), len(seeds))
+		require.Equal(t, ctr.Len(), len(seeds))
 
 		// Insert duplicates. No changed for length.
 		for k, v := range seeds {
-			box.Insert(k, v)
+			ctr.Insert(k, v)
 		}
-		require.Equal(t, box.Len(), len(seeds))
+		require.Equal(t, ctr.Len(), len(seeds))
 
 		// Delete a not exists key.
-		require.Nil(t, box.Delete(container.Int(10240)))
-		require.Equal(t, box.Len(), len(seeds))
+		require.Nil(t, ctr.Delete(container.Int(10240)))
+		require.Equal(t, ctr.Len(), len(seeds))
 
 		// Update, No changed for length.
 		for k, v := range seeds {
-			box.Update(k, v+v)
-			require.Equal(t, box.Len(), len(seeds))
+			ctr.Update(k, v+v)
+			require.Equal(t, ctr.Len(), len(seeds))
 		}
-		require.Equal(t, box.Len(), len(seeds))
+		require.Equal(t, ctr.Len(), len(seeds))
 
 		// Delete and empty.
 		i = len(seeds) - 1
 		for k := range seeds {
-			box.Delete(k)
-			require.Equal(t, box.Len(), i)
-			box.Delete(k)
-			require.Equal(t, box.Len(), i)
+			ctr.Delete(k)
+			require.Equal(t, ctr.Len(), i)
+			ctr.Delete(k)
+			require.Equal(t, ctr.Len(), i)
 			i--
 		}
-		require.Equal(t, box.Len(), 0)
+		require.Equal(t, ctr.Len(), 0)
 
 		// Replace as Insert,
 		i = 1
 		for k, v := range seeds {
-			box.Insert(k, v)
-			require.Equal(t, box.Len(), i)
+			ctr.Insert(k, v)
+			require.Equal(t, ctr.Len(), i)
 			i++
 		}
-		require.Equal(t, box.Len(), len(seeds))
+		require.Equal(t, ctr.Len(), len(seeds))
 
 		// Replace as Update, no changed.
 		for k, v := range seeds {
-			box.Replace(k, v+v)
-			require.Equal(t, box.Len(), len(seeds))
+			ctr.Replace(k, v+v)
+			require.Equal(t, ctr.Len(), len(seeds))
 		}
-		require.Equal(t, box.Len(), len(seeds))
+		require.Equal(t, ctr.Len(), len(seeds))
 
 		//Delete and empty.
 		i = len(seeds) - 1
 		for k := range seeds {
-			box.Delete(k)
-			require.Equal(t, box.Len(), i)
-			box.Delete(k)
-			require.Equal(t, box.Len(), i)
+			ctr.Delete(k)
+			require.Equal(t, ctr.Len(), i)
+			ctr.Delete(k)
+			require.Equal(t, ctr.Len(), i)
 			i--
 		}
-		require.Equal(t, box.Len(), 0)
+		require.Equal(t, ctr.Len(), 0)
 	}
 
 	// Test for all container implementation.
