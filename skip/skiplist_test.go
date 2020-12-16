@@ -79,7 +79,7 @@ func TestList_createNode(t *testing.T) {
 
 func TestList_Delete(t *testing.T) {
 	sl := New()
-	require.NotNil(t, sl.Insert(container.Int(11), 1021))
+	sl.Insert(container.Int(11), 1021)
 
 	element := sl.Delete(container.Int(11))
 	require.NotNil(t, element)
@@ -99,8 +99,7 @@ func TestList(t *testing.T) {
 		for i := 0; i < length; i++ {
 			for {
 				k := container.Int64(r.Intn(maxKey) + 1)
-				if sl.Insert(k, int64(k*2+1)) != nil {
-					require.Nil(t, sl.Insert(k, int64(k*2+1)))
+				if _, ok := sl.Insert(k, int64(k*2+1)); ok {
 					keys[i] = k
 					break
 				}
@@ -114,8 +113,10 @@ func TestList(t *testing.T) {
 
 		// boundary
 		for _, k := range []container.Int64{0, 0xfffffff} {
-			require.NotNil(t, sl.Insert(k, k))
-			require.Nil(t, sl.Insert(k, k))
+			_, ok := sl.Insert(k, k)
+			require.True(t, ok)
+			_, ok = sl.Insert(k, k)
+			require.False(t, ok)
 			require.NotNil(t, sl.Search(k))
 			require.Equal(t, sl.Search(k).Value(), k)
 			require.NotNil(t, sl.Delete(k))

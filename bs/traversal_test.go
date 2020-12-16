@@ -21,7 +21,7 @@ func buildBSTree() (tr *Tree) {
 	for i := 0; i < length; i++ {
 		for {
 			k := container.Int64(r.Intn(maxKey) + 1)
-			if tr.Insert(k, k*2+1) != nil {
+			if _, ok := tr.Insert(k, k*2+1); ok {
 				break
 			}
 		}

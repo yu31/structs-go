@@ -27,7 +27,7 @@ func checkCorrect(t *testing.T, n *treeNode) {
 
 func Test_Interface(t *testing.T) {
 	// Ensure the interface is implemented.
-	var node TreeNode
+	var node container.TreeNode
 	var element container.Element
 
 	node = &treeNode{}
@@ -70,8 +70,7 @@ func TestTree(t *testing.T) {
 		for i := 0; i < length; i++ {
 			for {
 				k := container.Int(r.Intn(maxKey) + 1)
-				if tr.Insert(k, int64(k*2+1)) != nil {
-					require.Nil(t, tr.Insert(k, int64(k*2+1)))
+				if _, ok := tr.Insert(k, int64(k*2+1)); ok {
 					keys[i] = k
 					break
 				}

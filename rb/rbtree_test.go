@@ -112,8 +112,7 @@ func TestTree(t *testing.T) {
 		for i := 0; i < length; i++ {
 			for {
 				k := container.Int64(r.Intn(maxKey) + 1)
-				if tr.Insert(k, int64(k*2+1)) != nil {
-					require.Nil(t, tr.Insert(k, int64(k*2+1)))
+				if _, ok := tr.Insert(k, int64(k*2+1)); ok {
 					keys[i] = k
 					break
 				}
@@ -127,8 +126,10 @@ func TestTree(t *testing.T) {
 
 		// boundary
 		for _, k := range []container.Int64{0, 0xfffffff} {
-			require.NotNil(t, tr.Insert(k, k))
-			require.Nil(t, tr.Insert(k, k))
+			_, ok := tr.Insert(k, k)
+			require.True(t, ok)
+			_, ok = tr.Insert(k, k)
+			require.False(t, ok)
 			require.NotNil(t, tr.Search(k))
 			require.Equal(t, tr.Search(k).Value(), k)
 			require.NotNil(t, tr.Delete(k))

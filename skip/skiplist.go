@@ -65,9 +65,10 @@ func (sl *List) Len() int {
 	return sl.lens[0]
 }
 
-// Insert inserts and returns an Element with the given key and value.
-// Returns nil if key already exists.
-func (sl *List) Insert(k Key, v Value) Element {
+// Insert inserts and returns an Element with given key and value if key doesn't exists.
+// Or else, returns the existing Element for the key if present.
+// The bool result is true if an Element was inserted, false if searched.
+func (sl *List) Insert(k Key, v Value) (Element, bool) {
 	level := sl.chooseLevel()
 	if level > sl.level {
 		sl.level = level
@@ -81,7 +82,7 @@ func (sl *List) Insert(k Key, v Value) Element {
 		}
 		if p.next[i] != nil && p.next[i].key.Compare(k) == 0 {
 			// The key already exists. Not allowed duplicates.
-			return nil
+			return p.next[i], false
 		}
 		updates[i] = p
 	}
@@ -92,7 +93,7 @@ func (sl *List) Insert(k Key, v Value) Element {
 		updates[i].next[i] = n
 		sl.lens[i]++
 	}
-	return n
+	return n, true
 }
 
 // Delete removes and returns the Element of a given key.
@@ -164,10 +165,11 @@ func (sl *List) Update(k Key, v Value) Element {
 }
 
 // Replace inserts or updates an Element by giving key and value.
+// The bool result is true if an Element was inserted, false if an Element was updated.
 //
-// The action are same as the Insert method if key not found,
+// The operation are same as the Insert method if key not found,
 // And are same as the Update method if key exists.
-func (sl *List) Replace(k Key, v Value) Element {
+func (sl *List) Replace(k Key, v Value) (Element, bool) {
 	var node *listNode
 
 	updates := make([]*listNode, maxLevel+1)
@@ -183,7 +185,7 @@ func (sl *List) Replace(k Key, v Value) Element {
 	}
 
 	if node == nil {
-		// The key not found, creates and inserts a newly node.
+		// The key not found, creates and inserts a new node.
 		level := sl.chooseLevel()
 		if level > sl.level {
 			for i := level; i > sl.level; i-- {
@@ -198,7 +200,7 @@ func (sl *List) Replace(k Key, v Value) Element {
 			updates[i].next[i] = node
 			sl.lens[i]++
 		}
-		return node
+		return node, true
 	}
 
 	// creates a new node and instead of the old node.
@@ -216,7 +218,7 @@ func (sl *List) Replace(k Key, v Value) Element {
 
 	// reset the unused field.
 	node.next = nil
-	return node
+	return node, false
 }
 
 // Search searches the Element of a given key.
