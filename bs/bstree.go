@@ -61,6 +61,11 @@ func New() *Tree {
 	}
 }
 
+// Root returns the root node of the tree.
+func (tr *Tree) Root() TreeNode {
+	return tr.root
+}
+
 // Len returns the number of elements.
 func (tr *Tree) Len() int {
 	return tr.len

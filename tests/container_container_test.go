@@ -49,8 +49,16 @@ func TestContainer_Interface(t *testing.T) {
 	t.Run("iterator", func(t *testing.T) {
 		var it container.Iterator
 		_ = it
-
 		it = bs.NewIterator(nil, nil, nil)
+	})
+
+	t.Run("tree", func(t *testing.T) {
+		var box container.Tree
+		_ = box
+
+		box = bs.New()
+		box = avl.New()
+		box = rb.New()
 	})
 }
 
@@ -82,18 +90,12 @@ func TestContainer_Insert(t *testing.T) {
 		}
 	}
 
-	t.Run("bstree", func(t *testing.T) {
-		process(bs.New())
-	})
-	t.Run("avtree", func(t *testing.T) {
-		process(avl.New())
-	})
-	t.Run("rbtree", func(t *testing.T) {
-		process(rb.New())
-	})
-	t.Run("skiplist", func(t *testing.T) {
-		process(skip.New())
-	})
+	// Test for all container implementation.
+	for name, f := range containers {
+		t.Run(name, func(t *testing.T) {
+			process(f())
+		})
+	}
 }
 
 func TestContainer_Delete(t *testing.T) {
@@ -122,18 +124,12 @@ func TestContainer_Delete(t *testing.T) {
 		}
 	}
 
-	t.Run("bstree", func(t *testing.T) {
-		process(bs.New())
-	})
-	t.Run("avtree", func(t *testing.T) {
-		process(avl.New())
-	})
-	t.Run("rbtree", func(t *testing.T) {
-		process(rb.New())
-	})
-	t.Run("skiplist", func(t *testing.T) {
-		process(skip.New())
-	})
+	// Test for all container implementation.
+	for name, f := range containers {
+		t.Run(name, func(t *testing.T) {
+			process(f())
+		})
+	}
 }
 
 func TestContainer_Search(t *testing.T) {
@@ -159,18 +155,12 @@ func TestContainer_Search(t *testing.T) {
 		}
 	}
 
-	t.Run("bstree", func(t *testing.T) {
-		process(bs.New())
-	})
-	t.Run("avtree", func(t *testing.T) {
-		process(avl.New())
-	})
-	t.Run("rbtree", func(t *testing.T) {
-		process(rb.New())
-	})
-	t.Run("skiplist", func(t *testing.T) {
-		process(skip.New())
-	})
+	// Test for all container implementation.
+	for name, f := range containers {
+		t.Run(name, func(t *testing.T) {
+			process(f())
+		})
+	}
 }
 
 func TestContainer_Update(t *testing.T) {
@@ -213,18 +203,12 @@ func TestContainer_Update(t *testing.T) {
 		}
 	}
 
-	t.Run("bstree", func(t *testing.T) {
-		process(bs.New())
-	})
-	t.Run("avtree", func(t *testing.T) {
-		process(avl.New())
-	})
-	t.Run("rbtree", func(t *testing.T) {
-		process(rb.New())
-	})
-	t.Run("skiplist", func(t *testing.T) {
-		process(skip.New())
-	})
+	// Test for all container implementation.
+	for name, f := range containers {
+		t.Run(name, func(t *testing.T) {
+			process(f())
+		})
+	}
 }
 
 func TestContainer_Replace(t *testing.T) {
@@ -274,18 +258,12 @@ func TestContainer_Replace(t *testing.T) {
 		}
 	}
 
-	t.Run("bstree", func(t *testing.T) {
-		process(bs.New())
-	})
-	t.Run("avtree", func(t *testing.T) {
-		process(avl.New())
-	})
-	t.Run("rbtree", func(t *testing.T) {
-		process(rb.New())
-	})
-	t.Run("skiplist", func(t *testing.T) {
-		process(skip.New())
-	})
+	// Test for all container implementation.
+	for name, f := range containers {
+		t.Run(name, func(t *testing.T) {
+			process(f())
+		})
+	}
 }
 
 func TestContainer_Len(t *testing.T) {
@@ -361,16 +339,10 @@ func TestContainer_Len(t *testing.T) {
 		require.Equal(t, box.Len(), 0)
 	}
 
-	t.Run("bstree", func(t *testing.T) {
-		process(bs.New())
-	})
-	t.Run("avtree", func(t *testing.T) {
-		process(avl.New())
-	})
-	t.Run("rbtree", func(t *testing.T) {
-		process(rb.New())
-	})
-	t.Run("skiplist", func(t *testing.T) {
-		process(skip.New())
-	})
+	// Test for all container implementation.
+	for name, f := range containers {
+		t.Run(name, func(t *testing.T) {
+			process(f())
+		})
+	}
 }

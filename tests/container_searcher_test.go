@@ -5,11 +5,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/yu31/gostructs/avl"
-	"github.com/yu31/gostructs/bs"
 	"github.com/yu31/gostructs/container"
-	"github.com/yu31/gostructs/rb"
-	"github.com/yu31/gostructs/skip"
 )
 
 // --------- order in container: [22, 24, 35, 61, 64, 67, 76, 84, 87, 91, 97, 130, 133, 145, 150] ---------
@@ -136,18 +132,12 @@ func TestContainerSearcher_Range(t *testing.T) {
 		})
 	}
 
-	t.Run("bstree", func(t *testing.T) {
-		process(t, bs.New())
-	})
-	t.Run("avtree", func(t *testing.T) {
-		process(t, avl.New())
-	})
-	t.Run("rbtree", func(t *testing.T) {
-		process(t, rb.New())
-	})
-	t.Run("skiplist", func(t *testing.T) {
-		process(t, skip.New())
-	})
+	// Test for all container implementation.
+	for name, f := range containers {
+		t.Run(name, func(t *testing.T) {
+			process(t, f())
+		})
+	}
 }
 
 func TestContainerSearcher_LastLT(t *testing.T) {
@@ -217,18 +207,12 @@ func TestContainerSearcher_LastLT(t *testing.T) {
 		require.Equal(t, element.Value(), int64(150*2+1))
 	}
 
-	t.Run("bstree", func(t *testing.T) {
-		process(bs.New())
-	})
-	t.Run("avtree", func(t *testing.T) {
-		process(avl.New())
-	})
-	t.Run("rbtree", func(t *testing.T) {
-		process(rb.New())
-	})
-	t.Run("skiplist", func(t *testing.T) {
-		process(skip.New())
-	})
+	// Test for all container implementation.
+	for name, f := range containers {
+		t.Run(name, func(t *testing.T) {
+			process(f())
+		})
+	}
 }
 
 func TestContainerSearcher_LastLE(t *testing.T) {
@@ -300,18 +284,12 @@ func TestContainerSearcher_LastLE(t *testing.T) {
 		require.Equal(t, element.Value(), int64(150*2+1))
 	}
 
-	t.Run("bstree", func(t *testing.T) {
-		process(bs.New())
-	})
-	t.Run("avtree", func(t *testing.T) {
-		process(avl.New())
-	})
-	t.Run("rbtree", func(t *testing.T) {
-		process(rb.New())
-	})
-	t.Run("skiplist", func(t *testing.T) {
-		process(skip.New())
-	})
+	// Test for all container implementation.
+	for name, f := range containers {
+		t.Run(name, func(t *testing.T) {
+			process(f())
+		})
+	}
 }
 
 func TestContainerSearcher_FirstGT(t *testing.T) {
@@ -375,18 +353,12 @@ func TestContainerSearcher_FirstGT(t *testing.T) {
 		require.Nil(t, element)
 	}
 
-	t.Run("bstree", func(t *testing.T) {
-		process(bs.New())
-	})
-	t.Run("avtree", func(t *testing.T) {
-		process(avl.New())
-	})
-	t.Run("rbtree", func(t *testing.T) {
-		process(rb.New())
-	})
-	t.Run("skiplist", func(t *testing.T) {
-		process(skip.New())
-	})
+	// Test for all container implementation.
+	for name, f := range containers {
+		t.Run(name, func(t *testing.T) {
+			process(f())
+		})
+	}
 }
 
 func TestContainerSearcher_FirstGE(t *testing.T) {
@@ -453,16 +425,10 @@ func TestContainerSearcher_FirstGE(t *testing.T) {
 		require.Nil(t, element)
 	}
 
-	t.Run("bstree", func(t *testing.T) {
-		process(bs.New())
-	})
-	t.Run("avtree", func(t *testing.T) {
-		process(avl.New())
-	})
-	t.Run("rbtree", func(t *testing.T) {
-		process(rb.New())
-	})
-	t.Run("skiplist", func(t *testing.T) {
-		process(skip.New())
-	})
+	// Test for all container implementation.
+	for name, f := range containers {
+		t.Run(name, func(t *testing.T) {
+			process(f())
+		})
+	}
 }

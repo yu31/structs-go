@@ -25,17 +25,6 @@ func checkCorrect(t *testing.T, n *treeNode) {
 	}
 }
 
-func Test_Interface(t *testing.T) {
-	// Ensure the interface is implemented.
-	var node container.TreeNode
-	var element container.Element
-
-	node = &treeNode{}
-	_ = node
-	element = &treeNode{}
-	_ = element
-}
-
 func TestNew(t *testing.T) {
 	tr := New()
 	require.NotNil(t, tr)

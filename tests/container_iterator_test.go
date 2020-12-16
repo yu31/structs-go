@@ -5,11 +5,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/yu31/gostructs/avl"
-	"github.com/yu31/gostructs/bs"
 	"github.com/yu31/gostructs/container"
-	"github.com/yu31/gostructs/rb"
-	"github.com/yu31/gostructs/skip"
 )
 
 func TestContainer_Iterator(t *testing.T) {
@@ -260,16 +256,10 @@ func TestContainer_Iterator(t *testing.T) {
 		})
 	}
 
-	t.Run("bstree", func(t *testing.T) {
-		process(t, bs.New())
-	})
-	t.Run("avtree", func(t *testing.T) {
-		process(t, avl.New())
-	})
-	t.Run("rbtree", func(t *testing.T) {
-		process(t, rb.New())
-	})
-	t.Run("skiplist", func(t *testing.T) {
-		process(t, skip.New())
-	})
+	// Test for all container implementation.
+	for name, f := range containers {
+		t.Run(name, func(t *testing.T) {
+			process(t, f())
+		})
+	}
 }

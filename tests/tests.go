@@ -4,8 +4,39 @@ import (
 	"math/rand"
 	"time"
 
+	"github.com/yu31/gostructs/avl"
+	"github.com/yu31/gostructs/bs"
 	"github.com/yu31/gostructs/container"
+	"github.com/yu31/gostructs/rb"
+	"github.com/yu31/gostructs/skip"
 )
+
+var containers = map[string]func() container.Container{
+	"bstree": func() container.Container {
+		return bs.New()
+	},
+	"avltree": func() container.Container {
+		return avl.New()
+	},
+	"rbtree": func() container.Container {
+		return rb.New()
+	},
+	"skiplist": func() container.Container {
+		return skip.New()
+	},
+}
+
+var trees = map[string]func() container.Tree{
+	"bstree": func() container.Tree {
+		return bs.New()
+	},
+	"avltree": func() container.Tree {
+		return avl.New()
+	},
+	"rbtree": func() container.Tree {
+		return rb.New()
+	},
+}
 
 func shuffleSeeds(s1 []container.Int64) []container.Int64 {
 	r := rand.New(rand.NewSource(time.Now().UnixNano()))

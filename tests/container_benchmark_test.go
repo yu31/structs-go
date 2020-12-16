@@ -5,11 +5,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/yu31/gostructs/avl"
-	"github.com/yu31/gostructs/bs"
 	"github.com/yu31/gostructs/container"
-	"github.com/yu31/gostructs/rb"
-	"github.com/yu31/gostructs/skip"
 )
 
 func BenchmarkContainer_Insert(b *testing.B) {
@@ -22,18 +18,12 @@ func BenchmarkContainer_Insert(b *testing.B) {
 		}
 	}
 
-	b.Run("bstree", func(b *testing.B) {
-		process(b, bs.New())
-	})
-	b.Run("avtree", func(b *testing.B) {
-		process(b, avl.New())
-	})
-	b.Run("rbtree", func(b *testing.B) {
-		process(b, rb.New())
-	})
-	b.Run("skiplist", func(b *testing.B) {
-		process(b, skip.New())
-	})
+	// Test for all container implementation.
+	for name, f := range containers {
+		b.Run(name, func(b *testing.B) {
+			process(b, f())
+		})
+	}
 }
 
 func BenchmarkContainer_Search(b *testing.B) {
@@ -49,18 +39,12 @@ func BenchmarkContainer_Search(b *testing.B) {
 		}
 	}
 
-	b.Run("bstree", func(b *testing.B) {
-		process(b, bs.New())
-	})
-	b.Run("avtree", func(b *testing.B) {
-		process(b, avl.New())
-	})
-	b.Run("rbtree", func(b *testing.B) {
-		process(b, rb.New())
-	})
-	b.Run("skiplist", func(b *testing.B) {
-		process(b, skip.New())
-	})
+	// Test for all container implementation.
+	for name, f := range containers {
+		b.Run(name, func(b *testing.B) {
+			process(b, f())
+		})
+	}
 }
 
 func BenchmarkContainer_Delete(b *testing.B) {
@@ -76,18 +60,12 @@ func BenchmarkContainer_Delete(b *testing.B) {
 		}
 	}
 
-	b.Run("bstree", func(b *testing.B) {
-		process(b, bs.New())
-	})
-	b.Run("avtree", func(b *testing.B) {
-		process(b, avl.New())
-	})
-	b.Run("rbtree", func(b *testing.B) {
-		process(b, rb.New())
-	})
-	b.Run("skiplist", func(b *testing.B) {
-		process(b, skip.New())
-	})
+	// Test for all container implementation.
+	for name, f := range containers {
+		b.Run(name, func(b *testing.B) {
+			process(b, f())
+		})
+	}
 }
 
 func BenchmarkContainer_Update(b *testing.B) {
@@ -103,18 +81,12 @@ func BenchmarkContainer_Update(b *testing.B) {
 		}
 	}
 
-	b.Run("bstree", func(b *testing.B) {
-		process(b, bs.New())
-	})
-	b.Run("avtree", func(b *testing.B) {
-		process(b, avl.New())
-	})
-	b.Run("rbtree", func(b *testing.B) {
-		process(b, rb.New())
-	})
-	b.Run("skiplist", func(b *testing.B) {
-		process(b, skip.New())
-	})
+	// Test for all container implementation.
+	for name, f := range containers {
+		b.Run(name, func(b *testing.B) {
+			process(b, f())
+		})
+	}
 }
 
 func BenchmarkContainer_Replace(b *testing.B) {
@@ -135,16 +107,10 @@ func BenchmarkContainer_Replace(b *testing.B) {
 		})
 	}
 
-	b.Run("bstree", func(b *testing.B) {
-		process(b, bs.New())
-	})
-	b.Run("avtree", func(b *testing.B) {
-		process(b, avl.New())
-	})
-	b.Run("rbtree", func(b *testing.B) {
-		process(b, rb.New())
-	})
-	b.Run("skiplist", func(b *testing.B) {
-		process(b, skip.New())
-	})
+	// Test for all container implementation.
+	for name, f := range containers {
+		b.Run(name, func(b *testing.B) {
+			process(b, f())
+		})
+	}
 }

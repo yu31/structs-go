@@ -33,6 +33,11 @@ type treeNode struct {
 	color  int8
 }
 
+// Root returns the root node of the tree.
+func (tr *Tree) Root() TreeNode {
+	return tr.root
+}
+
 // Key returns the key.
 func (n *treeNode) Key() Key {
 	return n.key

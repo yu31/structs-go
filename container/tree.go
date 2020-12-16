@@ -13,3 +13,10 @@ type TreeNode interface {
 	// Right returns the right child of the TreeNode.
 	Right() TreeNode
 }
+
+// Tree declares an interface of Binary Search Tree.
+type Tree interface {
+	Container
+	// Root returns the root node of the tree.
+	Root() TreeNode
+}
