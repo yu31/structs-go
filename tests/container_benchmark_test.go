@@ -18,7 +18,7 @@ func BenchmarkContainer_Insert(b *testing.B) {
 	process := func(b *testing.B, box container.Container) {
 		b.ResetTimer()
 		for i := 0; i < b.N; i++ {
-			box.Insert(container.Int64(r.Int63()), nil)
+			box.Insert(container.Int64(r.Intn(b.N*100)), nil)
 		}
 	}
 
@@ -41,11 +41,11 @@ func BenchmarkContainer_Search(b *testing.B) {
 
 	process := func(b *testing.B, box container.Container) {
 		for i := 0; i < b.N; i++ {
-			box.Insert(container.Int64(r.Int63()), nil)
+			box.Insert(container.Int64(r.Intn(b.N*100)), nil)
 		}
 		b.ResetTimer()
 		for i := 0; i < b.N; i++ {
-			box.Search(container.Int64(r.Int63()))
+			box.Search(container.Int64(r.Intn(b.N * 100)))
 		}
 	}
 
@@ -68,12 +68,71 @@ func BenchmarkContainer_Delete(b *testing.B) {
 
 	process := func(b *testing.B, box container.Container) {
 		for i := 0; i < b.N; i++ {
-			box.Insert(container.Int64(r.Int63()), nil)
+			box.Insert(container.Int64(r.Intn(b.N*100)), nil)
 		}
 		b.ResetTimer()
 		for i := 0; i < b.N; i++ {
-			box.Delete(container.Int64(r.Int63()))
+			box.Delete(container.Int64(r.Intn(b.N * 100)))
 		}
+	}
+
+	b.Run("bstree", func(b *testing.B) {
+		process(b, bs.New())
+	})
+	b.Run("avtree", func(b *testing.B) {
+		process(b, avl.New())
+	})
+	b.Run("rbtree", func(b *testing.B) {
+		process(b, rb.New())
+	})
+	b.Run("skiplist", func(b *testing.B) {
+		process(b, skip.New())
+	})
+}
+
+func BenchmarkContainer_Update(b *testing.B) {
+	r := rand.New(rand.NewSource(time.Now().UnixNano()))
+
+	process := func(b *testing.B, box container.Container) {
+		for i := 0; i < b.N; i++ {
+			box.Insert(container.Int64(r.Intn(b.N*100)), nil)
+		}
+		b.ResetTimer()
+		for i := 0; i < b.N; i++ {
+			box.Update(container.Int64(r.Intn(b.N*100)), nil)
+		}
+	}
+
+	b.Run("bstree", func(b *testing.B) {
+		process(b, bs.New())
+	})
+	b.Run("avtree", func(b *testing.B) {
+		process(b, avl.New())
+	})
+	b.Run("rbtree", func(b *testing.B) {
+		process(b, rb.New())
+	})
+	b.Run("skiplist", func(b *testing.B) {
+		process(b, skip.New())
+	})
+}
+
+func BenchmarkContainer_Replace(b *testing.B) {
+	r := rand.New(rand.NewSource(time.Now().UnixNano()))
+
+	process := func(b *testing.B, box container.Container) {
+		b.Run("same-insert", func(b *testing.B) {
+			b.ResetTimer()
+			for i := 0; i < b.N; i++ {
+				box.Replace(container.Int64(r.Intn(b.N*100)), nil)
+			}
+		})
+		b.Run("same-update", func(b *testing.B) {
+			b.ResetTimer()
+			for i := 0; i < b.N; i++ {
+				box.Replace(container.Int64(r.Intn(b.N*100)), nil)
+			}
+		})
 	}
 
 	b.Run("bstree", func(b *testing.B) {
