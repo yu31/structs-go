@@ -1,9 +1,7 @@
 package tests
 
 import (
-	"math/rand"
 	"testing"
-	"time"
 
 	"github.com/stretchr/testify/require"
 
@@ -14,24 +12,12 @@ import (
 	"github.com/yu31/gostructs/skip"
 )
 
-func shuffleSeeds(s1 []container.Int64) []container.Int64 {
-	r := rand.New(rand.NewSource(time.Now().UnixNano()))
-	s2 := make([]container.Int64, len(s1))
-	for i := 0; i < len(s1); i++ {
-		s2[i] = s1[i]
-	}
-	for i := len(s2) - 1; i > 0; i-- {
-		num := r.Intn(i + 1)
-		s2[i], s2[num] = s2[num], s2[i]
-	}
-	return s2
-}
-
 func TestContainer_Iterator(t *testing.T) {
-	// --------- sequence in box: [22, 24, 35, 61, 64, 67, 76, 84, 87, 91, 97, 130, 133, 145, 150] ---------
+	// --------- order in container: [22, 24, 35, 61, 64, 67, 76, 84, 87, 91, 97, 130, 133, 145, 150] ---------
 	seeds := []container.Int64{22, 24, 35, 61, 64, 67, 76, 84, 87, 91, 97, 130, 133, 145, 150}
 
 	process := func(t *testing.T, box container.Container) {
+		// Insert seeds in random order
 		for _, k := range shuffleSeeds(seeds) {
 			box.Insert(k, int64(k*2+1))
 		}

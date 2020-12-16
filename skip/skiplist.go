@@ -241,6 +241,54 @@ func (sl *List) Iter(start Key, boundary Key) container.Iterator {
 	return newIterator(sl, start, boundary)
 }
 
+// Range calls f sequentially each TreeNode present in the Tree.
+// If f returns false, range stops the iteration.
+func (sl *List) Range(start Key, boundary Key, f func(ele Element) bool) {
+	var node *listNode
+	var end *listNode
+
+	// If both the start and boundary are not nil, the start should less than the boundary.
+	if !(start != nil && boundary != nil && start.Compare(boundary) != -1) {
+		if start == nil {
+			node = sl.head.next[0]
+		} else {
+			node = sl.searchFirstGE(start)
+		}
+
+		if boundary != nil {
+			end = sl.searchFirstGE(boundary)
+		}
+	}
+
+	for node != nil && node != end {
+		// Stop iteration if return false.
+		if !f(node) {
+			return
+		}
+		node = node.next[0]
+	}
+}
+
+// LastLT searches for the last node that less than the key.
+func (sl *List) LastLT(k Key) Element {
+	return sl.searchLastLT(k)
+}
+
+// LastLE search for the last node that less than or equal to the key.
+func (sl *List) LastLE(k Key) Element {
+	return sl.searchLastLE(k)
+}
+
+// FirstGT search for the first node that greater than to the key.
+func (sl *List) FirstGT(k Key) Element {
+	return sl.searchFirstGT(k)
+}
+
+// FirstGE search for the first node that greater than or equal to the key.
+func (sl *List) FirstGE(k Key) Element {
+	return sl.searchFirstGE(k)
+}
+
 func (sl *List) createNode(k Key, v Value, level int) *listNode {
 	return &listNode{
 		key:   k,

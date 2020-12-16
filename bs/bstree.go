@@ -120,6 +120,34 @@ func (tr *Tree) Iter(start Key, boundary Key) container.Iterator {
 	return NewIterator(tr.root, start, boundary)
 }
 
+// Range calls f sequentially each TreeNode present in the Tree.
+// If f returns false, range stops the iteration.
+func (tr *Tree) Range(start Key, boundary Key, f func(ele Element) bool) {
+	Range(tr.root, start, boundary, func(node TreeNode) bool {
+		return f(node)
+	})
+}
+
+// LastLT searches for the last node that less than the key.
+func (tr *Tree) LastLT(k Key) Element {
+	return LastLT(tr.root, k)
+}
+
+// LastLE search for the last node that less than or equal to the key.
+func (tr *Tree) LastLE(k Key) Element {
+	return LastLE(tr.root, k)
+}
+
+// FirstGT search for the first node that greater than to the key.
+func (tr *Tree) FirstGT(k Key) Element {
+	return FirstGT(tr.root, k)
+}
+
+// FirstGE search for the first node that greater than or equal to the key.
+func (tr *Tree) FirstGE(k Key) Element {
+	return FirstGE(tr.root, k)
+}
+
 // The insertOrSearch inserts and returns a new node with given key and value if key not exists.
 // Or else, returns the exists node and its parent node for the key if present.
 // The ok result is true if the node was inserted, false if searched.
@@ -254,3 +282,23 @@ func (tr *Tree) swap(n1, n2 *treeNode) {
 	n1.key, n2.key = n2.key, n1.key
 	n1.value, n2.value = n2.value, n1.value
 }
+
+//// Iteration with recursion.
+//func (tr *Tree) rangeRecursion(root *treeNode, start Key, boundary Key, f func(node *treeNode) bool) {
+//	if root == nil {
+//		return
+//	}
+//
+//	if start != nil && root.key.Compare(start) == -1 {
+//		tr.rangeRecursion(root.right, start, boundary, f)
+//	} else if boundary != nil && root.key.Compare(boundary) != -1 {
+//		tr.rangeRecursion(root.left, start, boundary, f)
+//	} else {
+//		// start <= node <= boundary
+//		tr.rangeRecursion(root.left, start, boundary, f)
+//		if !f(root) {
+//			return
+//		}
+//		tr.rangeRecursion(root.right, start, boundary, f)
+//	}
+//}

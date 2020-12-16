@@ -22,6 +22,8 @@ type Element interface {
 
 // Container declares an data container interface.
 type Container interface {
+	Searcher
+
 	// Len returns the number of elements.
 	Len() int
 
