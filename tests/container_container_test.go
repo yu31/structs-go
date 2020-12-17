@@ -179,12 +179,12 @@ func TestContainer_Update(t *testing.T) {
 	}
 }
 
-func TestContainer_Replace(t *testing.T) {
+func TestContainer_Upsert(t *testing.T) {
 	process := func(ctr container.Container) {
-		// The key not exists, Replace same as the Insert
+		// The key not exists, Upsert same as the Insert
 		for k, v := range seeds {
 			require.Nil(t, ctr.Search(k))
-			ele, ok := ctr.Replace(k, v)
+			ele, ok := ctr.Upsert(k, v)
 			require.True(t, ok)
 			require.NotNil(t, ele)
 			require.Equal(t, ele.Key(), k)
@@ -205,9 +205,9 @@ func TestContainer_Replace(t *testing.T) {
 
 		require.Equal(t, ctr.Len(), len(seeds))
 
-		// The key already exists, Replace same as the Update.
+		// The key already exists, Upsert same as the Update.
 		for k, v := range seeds {
-			ele, ok := ctr.Replace(k, v+v)
+			ele, ok := ctr.Upsert(k, v+v)
 			require.False(t, ok)
 			require.NotNil(t, ele)
 			require.Equal(t, ele.Key(), k)
@@ -278,7 +278,7 @@ func TestContainer_Len(t *testing.T) {
 		}
 		require.Equal(t, ctr.Len(), 0)
 
-		// Replace as Insert,
+		// Upsert as Insert,
 		i = 1
 		for k, v := range seeds {
 			ctr.Insert(k, v)
@@ -287,9 +287,9 @@ func TestContainer_Len(t *testing.T) {
 		}
 		require.Equal(t, ctr.Len(), len(seeds))
 
-		// Replace as Update, no changed.
+		// Upsert as Update, no changed.
 		for k, v := range seeds {
-			ctr.Replace(k, v+v)
+			ctr.Upsert(k, v+v)
 			require.Equal(t, ctr.Len(), len(seeds))
 		}
 		require.Equal(t, ctr.Len(), len(seeds))

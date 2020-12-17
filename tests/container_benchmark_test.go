@@ -96,13 +96,13 @@ func BenchmarkContainer_Replace(b *testing.B) {
 		b.Run("same-insert", func(b *testing.B) {
 			b.ResetTimer()
 			for i := 0; i < b.N; i++ {
-				ctr.Replace(container.Int64(r.Intn(b.N*100)), nil)
+				ctr.Upsert(container.Int64(r.Intn(b.N*100)), nil)
 			}
 		})
 		b.Run("same-update", func(b *testing.B) {
 			b.ResetTimer()
 			for i := 0; i < b.N; i++ {
-				ctr.Replace(container.Int64(r.Intn(b.N*100)), nil)
+				ctr.Upsert(container.Int64(r.Intn(b.N*100)), nil)
 			}
 		})
 	}

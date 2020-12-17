@@ -63,12 +63,12 @@ type Container interface {
 	// Returns nil if the key not be found.
 	Update(k Key, v Value) Element
 
-	// Replace inserts or updates an Element by giving key and value.
+	// Upsert inserts or updates an Element by giving key and value.
 	// The bool result is true if an Element was inserted, false if an Element was updated.
 	//
 	// The operation are same as the Insert method if key not found,
 	// And are same as the Update method if key exists.
-	Replace(k Key, v Value) (Element, bool)
+	Upsert(k Key, v Value) (Element, bool)
 
 	// Search searches the Element of a given key.
 	// Returns nil if key not found.

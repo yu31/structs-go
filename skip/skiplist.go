@@ -160,12 +160,12 @@ func (sl *List) Update(k container.Key, v container.Value) container.Element {
 	return node
 }
 
-// Replace inserts or updates an Element by giving key and value.
+// Upsert inserts or updates an Element by giving key and value.
 // The bool result is true if an Element was inserted, false if an Element was updated.
 //
 // The operation are same as the Insert method if key not found,
 // And are same as the Update method if key exists.
-func (sl *List) Replace(k container.Key, v container.Value) (container.Element, bool) {
+func (sl *List) Upsert(k container.Key, v container.Value) (container.Element, bool) {
 	var node *listNode
 
 	updates := make([]*listNode, maxLevel+1)
