@@ -12,9 +12,14 @@ import (
 	"github.com/yu31/gostructs/internal/tree"
 )
 
+var (
+	_ container.Container = (*Tree)(nil)
+	_ container.Element   = (*treeNode)(nil)
+	_ container.Tree      = (*Tree)(nil)
+	_ container.TreeNode  = (*treeNode)(nil)
+)
+
 // treeNode is used for avl tree.
-//
-// And it is also the implementation of interface container.Element and container.TreeNode
 type treeNode struct {
 	key    container.Key
 	value  container.Value
@@ -44,8 +49,6 @@ func (n *treeNode) Right() container.TreeNode {
 }
 
 // Tree implements the AVL Tree.
-//
-// And it is also the implementation of interface container.Container
 type Tree struct {
 	root *treeNode
 	len  int

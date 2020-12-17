@@ -79,10 +79,7 @@ func (h *MinHeap) Empty() bool {
 
 // Push adds an element to the heap, Return the index number of the location.
 func (h *MinHeap) Push(k Key, v Value) *Item {
-	if h.Len() == h.Cap() {
-		h.grow(h.cap * 2)
-	}
-
+	h.autoGrow()
 	item := &Item{
 		key:   k,
 		value: v,
@@ -129,25 +126,6 @@ func (h *MinHeap) Peek() *Item {
 		return nil
 	}
 	return h.items[0]
-}
-
-func (h *MinHeap) grow(c int) {
-	if c > h.cap {
-		items := h.items
-		h.items = make([]*Item, c)
-		h.cap = c
-		copy(h.items, items)
-	}
-}
-
-func (h *MinHeap) swap(i, j int) {
-	h.items[i], h.items[j] = h.items[j], h.items[i]
-	h.items[i].index = i
-	h.items[j].index = j
-}
-
-func (h *MinHeap) compare(i, j int) int {
-	return h.items[i].key.Compare(h.items[j].key)
 }
 
 func (h *MinHeap) delete(i int) *Item {
@@ -197,4 +175,35 @@ func (h *MinHeap) down(i0 int, n int) bool {
 	}
 
 	return i > i0
+}
+
+func (h *MinHeap) swap(i, j int) {
+	h.items[i], h.items[j] = h.items[j], h.items[i]
+	h.items[i].index = i
+	h.items[j].index = j
+}
+
+func (h *MinHeap) compare(i, j int) int {
+	return h.items[i].key.Compare(h.items[j].key)
+}
+
+func (h *MinHeap) autoGrow() {
+	if h.len == h.cap {
+		newCap := h.cap
+		if h.len < 1024 {
+			newCap += h.cap
+		} else {
+			newCap += h.cap / 2
+		}
+		h.grow(newCap)
+	}
+}
+
+func (h *MinHeap) grow(c int) {
+	if c > h.cap {
+		items := h.items
+		h.items = make([]*Item, c)
+		h.cap = c
+		copy(h.items, items)
+	}
 }

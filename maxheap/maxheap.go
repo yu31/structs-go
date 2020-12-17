@@ -79,10 +79,7 @@ func (h *MaxHeap) Empty() bool {
 
 // Push adds an element to the heap, Return the index number of the location.
 func (h *MaxHeap) Push(k Key, v Value) *Item {
-	if h.Len() == h.Cap() {
-		h.grow(h.cap * 2)
-	}
-
+	h.autoGrow()
 	item := &Item{
 		key:   k,
 		value: v,
@@ -132,25 +129,6 @@ func (h *MaxHeap) Peek() *Item {
 	return h.items[0]
 }
 
-func (h *MaxHeap) grow(c int) {
-	if c > h.cap {
-		items := h.items
-		h.items = make([]*Item, c)
-		h.cap = c
-		copy(h.items, items)
-	}
-}
-
-func (h *MaxHeap) swap(i, j int) {
-	h.items[i], h.items[j] = h.items[j], h.items[i]
-	h.items[i].index = i
-	h.items[j].index = j
-}
-
-func (h *MaxHeap) compare(i, j int) int {
-	return h.items[i].key.Compare(h.items[j].key)
-}
-
 func (h *MaxHeap) delete(i int) *Item {
 	item := h.items[i]
 	h.len--
@@ -197,4 +175,35 @@ func (h *MaxHeap) down(i0 int, n int) bool {
 		i = c
 	}
 	return i > i0
+}
+
+func (h *MaxHeap) swap(i, j int) {
+	h.items[i], h.items[j] = h.items[j], h.items[i]
+	h.items[i].index = i
+	h.items[j].index = j
+}
+
+func (h *MaxHeap) compare(i, j int) int {
+	return h.items[i].key.Compare(h.items[j].key)
+}
+
+func (h *MaxHeap) autoGrow() {
+	if h.len == h.cap {
+		newCap := h.cap
+		if h.len < 1024 {
+			newCap += h.cap
+		} else {
+			newCap += h.cap / 2
+		}
+		h.grow(newCap)
+	}
+}
+
+func (h *MaxHeap) grow(c int) {
+	if c > h.cap {
+		items := h.items
+		h.items = make([]*Item, c)
+		h.cap = c
+		copy(h.items, items)
+	}
 }

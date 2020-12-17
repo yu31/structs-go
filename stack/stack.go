@@ -48,9 +48,7 @@ func (s *Stack) Empty() bool {
 
 // Push adds an element to the end of stack.
 func (s *Stack) Push(item interface{}) {
-	if s.cap == s.len {
-		s.grow(s.cap << 1)
-	}
+	s.autoGrow()
 	s.items[s.len] = item
 	s.len++
 }
@@ -75,10 +73,22 @@ func (s *Stack) Peek() interface{} {
 	return item
 }
 
-func (s *Stack) grow(n int) {
-	if n > s.cap {
+func (s *Stack) autoGrow() {
+	if s.len == s.cap {
+		newCap := s.cap
+		if s.len < 1024 {
+			newCap += s.cap
+		} else {
+			newCap += s.cap / 2
+		}
+		s.grow(newCap)
+	}
+}
+
+func (s *Stack) grow(c int) {
+	if c > s.cap {
 		items := s.items
-		s.cap = n
+		s.cap = c
 		s.items = make([]interface{}, s.cap)
 		copy(s.items, items)
 	}

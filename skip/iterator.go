@@ -5,15 +5,17 @@
 
 package skip
 
-import "github.com/yu31/gostructs/container"
+import (
+	"github.com/yu31/gostructs/container"
+)
+
+var _ container.Iterator = (*Iterator)(nil)
 
 // Iterator to iteration return element.
 //
 // The element range is start <= x < boundary.
 // The element will return from the beginning if start is nil,
 // And return until the end if the boundary is nil.
-//
-// And it is also the implementation of interface container.Iterator
 type Iterator struct {
 	node *listNode
 	end  *listNode

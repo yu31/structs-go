@@ -12,6 +12,8 @@ import (
 	"github.com/yu31/gostructs/stack"
 )
 
+var _ container.Iterator = (*Iterator)(nil)
+
 // Iterator to iteration return element.
 //
 // The element range is start <= x < boundary.
@@ -20,8 +22,6 @@ import (
 //
 // The Iterator return element with in-order traversal,
 // And it can used with all-type binary search trees.
-//
-// And it is also the implementation of interface container.Iterator
 type Iterator struct {
 	s        *stack.Stack
 	start    container.Key

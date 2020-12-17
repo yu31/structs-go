@@ -52,9 +52,7 @@ func (q *Queue) Empty() bool {
 
 // Push adds an element to the end of the queue.
 func (q *Queue) Push(item interface{}) {
-	if q.Len() == q.Cap() {
-		q.grow((q.cap - 1) * 2)
-	}
+	q.autoGrow()
 	q.items[q.behind] = item
 	q.behind = (q.behind + 1) % q.cap
 }
@@ -76,6 +74,18 @@ func (q *Queue) Peek() interface{} {
 		return nil
 	}
 	return q.items[q.front]
+}
+
+func (q *Queue) autoGrow() {
+	if q.Len() == q.Cap() {
+		newCap := q.cap - 1
+		if q.cap < 1024 {
+			newCap += newCap
+		} else {
+			newCap += newCap / 2
+		}
+		q.grow(newCap)
+	}
 }
 
 func (q *Queue) grow(c int) {

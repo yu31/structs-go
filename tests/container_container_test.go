@@ -8,12 +8,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/yu31/gostructs/avl"
-	"github.com/yu31/gostructs/bs"
 	"github.com/yu31/gostructs/container"
-	"github.com/yu31/gostructs/internal/tree"
-	"github.com/yu31/gostructs/rb"
-	"github.com/yu31/gostructs/skip"
 )
 
 var seeds map[container.Int]string
@@ -33,34 +28,6 @@ func init() {
 			}
 		}
 	}
-}
-
-func TestContainer_Interface(t *testing.T) {
-	// Ensure the bs/avl/rb/skip are implements the container.Container.
-	t.Run("container", func(t *testing.T) {
-		var ctr container.Container
-		_ = ctr
-
-		ctr = bs.New()
-		ctr = avl.New()
-		ctr = rb.New()
-		ctr = skip.New()
-	})
-
-	t.Run("iterator", func(t *testing.T) {
-		var it container.Iterator
-		_ = it
-		it = tree.NewIterator(nil, nil, nil)
-	})
-
-	t.Run("tree", func(t *testing.T) {
-		var ctr container.Tree
-		_ = ctr
-
-		ctr = bs.New()
-		ctr = avl.New()
-		ctr = rb.New()
-	})
 }
 
 func TestContainer_Insert(t *testing.T) {

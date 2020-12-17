@@ -12,18 +12,16 @@ import (
 	"github.com/yu31/gostructs/container"
 )
 
-// Type aliases for simplifying use in this package.
-//type Key = container.Key
-//type Value = container.Value
-//type Element = container.Element
+var (
+	_ container.Container = (*List)(nil)
+	_ container.Element   = (*listNode)(nil)
+)
 
 const (
 	maxLevel = 0x1f
 )
 
 // listNode is used for Skip List.
-//
-// And it is also the implementation of interface container.Element.
 type listNode struct {
 	key   container.Key
 	value container.Value
@@ -41,8 +39,6 @@ func (n *listNode) Value() container.Value {
 }
 
 // List implements Skip List.
-//
-// And it is also the implementation of interface container.Container
 type List struct {
 	head  *listNode
 	level int

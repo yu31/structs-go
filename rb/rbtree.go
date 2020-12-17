@@ -10,14 +10,19 @@ import (
 	"github.com/yu31/gostructs/internal/tree"
 )
 
+var (
+	_ container.Container = (*Tree)(nil)
+	_ container.Element   = (*treeNode)(nil)
+	_ container.Tree      = (*Tree)(nil)
+	_ container.TreeNode  = (*treeNode)(nil)
+)
+
 const (
 	red int8 = iota
 	black
 )
 
 // treeNode is used for Red-Black Tree.
-//
-// And it is also the implementation of interface container.Element and container.TreeNode
 type treeNode struct {
 	key    container.Key
 	value  container.Value
@@ -53,8 +58,6 @@ func (n *treeNode) Right() container.TreeNode {
 }
 
 // Tree implements the Red-Black Tree.
-//
-// And it is also the implementation of interface container.Container
 type Tree struct {
 	root *treeNode
 	len  int
