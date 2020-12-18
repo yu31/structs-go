@@ -93,15 +93,20 @@ func TestTree(t *testing.T) {
 
 		// search
 		for i := 0; i < length; i++ {
-			element := tr.Search(keys[i])
-			require.NotNil(t, element)
-			require.Equal(t, element.Value(), int64(keys[i]*2+1))
+			ele := tr.Search(keys[i])
+			require.NotNil(t, ele)
+			require.Equal(t, ele.Key(), keys[i])
+			require.Equal(t, ele.Value(), int64(keys[i]*2+1))
 		}
 
 		// delete
 		for i := 0; i < length; i++ {
-			require.NotNil(t, tr.Delete(keys[i]))
+			ele := tr.Delete(keys[i])
+			require.NotNil(t, ele)
+			require.Equal(t, ele.Key(), keys[i])
+			require.Equal(t, ele.Value(), int64(keys[i]*2+1))
 			require.Nil(t, tr.Delete(keys[i]))
+			require.Nil(t, tr.Search(keys[i]))
 
 			checkCorrect(t, tr.root)
 			require.Equal(t, tr.Len(), length-i-1)

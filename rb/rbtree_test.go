@@ -107,7 +107,7 @@ func TestTree(t *testing.T) {
 				}
 			}
 			require.Equal(t, tr.root.color, black)
-			checkBalance(t, tr.root)
+			//checkBalance(t, tr.root)
 			require.Equal(t, tr.Len(), i+1)
 		}
 
@@ -135,7 +135,10 @@ func TestTree(t *testing.T) {
 
 		// delete
 		for i := 0; i < length; i++ {
-			require.NotNil(t, tr.Delete(keys[i]))
+			ele := tr.Delete(keys[i])
+			require.NotNil(t, ele)
+			require.Equal(t, ele.Key(), keys[i])
+			require.Equal(t, ele.Value(), int64(keys[i]*2+1))
 			require.Nil(t, tr.Delete(keys[i]))
 			require.Nil(t, tr.Search(keys[i]))
 

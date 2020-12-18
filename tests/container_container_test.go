@@ -15,7 +15,7 @@ var seeds map[container.Int]string
 
 func init() {
 	r := rand.New(rand.NewSource(time.Now().UnixNano()))
-	length := 1024
+	length := 2048
 	maxKey := length * 1000
 	seeds = make(map[container.Int]string, length)
 

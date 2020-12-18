@@ -83,18 +83,7 @@ func (tr *Tree) Insert(k container.Key, v container.Value) (container.Element, b
 // Delete removes and returns the Element of a given key.
 // Returns nil if not found.
 func (tr *Tree) Delete(k container.Key) container.Element {
-	var d *treeNode
-	tr.root, d = tr.deleteBalance(tr.root, k)
-	if d == nil {
-		return nil
-	}
-
-	// reset the unused field.
-	d.left = nil
-	d.right = nil
-	d.height = -1
-
-	tr.len--
+	d := tr.deleteAndSearch(k)
 	return d
 }
 
@@ -103,7 +92,7 @@ func (tr *Tree) Delete(k container.Key) container.Element {
 func (tr *Tree) Update(k container.Key, v container.Value) container.Element {
 	node, parent := tr.searchNode(k)
 	if node != nil {
-		tr.updateNode(node, parent, k, v)
+		tr.replaceNode(node, parent, tr.createNode(k, v))
 	}
 	return node
 }
@@ -116,7 +105,7 @@ func (tr *Tree) Update(k container.Key, v container.Value) container.Element {
 func (tr *Tree) Upsert(k container.Key, v container.Value) (container.Element, bool) {
 	parent, node, ok := tr.insertOrSearch(k, v)
 	if !ok {
-		tr.updateNode(node, parent, k, v)
+		tr.replaceNode(node, parent, tr.createNode(k, v))
 	}
 	return node, ok
 }
@@ -173,6 +162,23 @@ func (tr *Tree) insertOrSearch(k container.Key, v container.Value) (parent *tree
 	return
 }
 
+// Helps searches and deletes a node with a given key.
+func (tr *Tree) deleteAndSearch(k container.Key) *treeNode {
+	var d *treeNode
+	tr.root, d = tr.deleteBalance(tr.root, k)
+	if d == nil {
+		return nil
+	}
+
+	// reset the unused field.
+	d.left = nil
+	d.right = nil
+	d.height = -1
+
+	tr.len--
+	return d
+}
+
 // Helps to creates an tree node with given key and value.
 func (tr *Tree) createNode(k container.Key, v container.Value) *treeNode {
 	return &treeNode{
@@ -184,25 +190,24 @@ func (tr *Tree) createNode(k container.Key, v container.Value) *treeNode {
 	}
 }
 
-// Help to creates a new tree node and instead of the node.
-func (tr *Tree) updateNode(node *treeNode, parent *treeNode, k container.Key, v container.Value) {
-	n0 := tr.createNode(k, v)
-	n0.left = node.left
-	n0.right = node.right
-	n0.height = node.height
+// Replace old with n0. parent is old's parent node.
+func (tr *Tree) replaceNode(old, parent, n0 *treeNode) {
+	n0.left = old.left
+	n0.right = old.right
+	n0.height = old.height
 
 	if parent == nil {
 		tr.root = n0
-	} else if parent.left == node {
+	} else if parent.left == old {
 		parent.left = n0
 	} else {
 		parent.right = n0
 	}
 
 	// reset the unused field.
-	node.left = nil
-	node.right = nil
-	node.height = -1
+	old.left = nil
+	old.right = nil
+	old.height = -1
 }
 
 // Searches the node and its parent node of a given key.
@@ -224,11 +229,6 @@ func (tr *Tree) searchNode(k container.Key) (node *treeNode, parent *treeNode) {
 		}
 	}
 	return
-}
-
-func (tr *Tree) swap(n1, n2 *treeNode) {
-	n1.key, n2.key = n2.key, n1.key
-	n1.value, n2.value = n2.value, n1.value
 }
 
 // ok is false means no new node created.
@@ -292,24 +292,29 @@ func (tr *Tree) deleteBalance(r0 *treeNode, k container.Key) (root *treeNode, d 
 		// delete from the right subtree.
 		root.right, d = tr.deleteBalance(root.right, k)
 	} else {
+		d = root
 		if root.left != nil && root.right != nil {
+			var x *treeNode
 			if tr.nodeHeight(root.left) > tr.nodeHeight(root.right) {
-				x := root.left
+				// Replace the location of the deleted node with its predecessor
+				x = root.left
 				for x.right != nil {
 					x = x.right
 				}
-				tr.swap(root, x)
-				root.left, d = tr.deleteBalance(root.left, k)
+				x.left, _ = tr.deleteBalance(root.left, x.key)
+				x.right = root.right
 			} else {
-				x := root.right
+				// Replace the location of the deleted node with its successor
+				x = root.right
 				for x.left != nil {
 					x = x.left
 				}
-				tr.swap(root, x)
-				root.right, d = tr.deleteBalance(root.right, k)
+				x.right, _ = tr.deleteBalance(root.right, x.key)
+				x.left = root.left
 			}
+			x.height = tr.calculateHeight(x)
+			root = x
 		} else {
-			d = root
 			if d.left != nil {
 				root = d.left
 			} else {

@@ -87,11 +87,7 @@ func (tr *Tree) Insert(k container.Key, v container.Value) (container.Element, b
 // Delete removes and returns the Element of a given key.
 // Returns nil if not found.
 func (tr *Tree) Delete(k container.Key) container.Element {
-	node := tr.searchNode(k)
-	if node == nil {
-		return nil
-	}
-	node = tr.deleteNode(node)
+	node := tr.deleteAndSearch(k)
 	return node
 }
 
@@ -100,7 +96,7 @@ func (tr *Tree) Delete(k container.Key) container.Element {
 func (tr *Tree) Update(k container.Key, v container.Value) container.Element {
 	node := tr.searchNode(k)
 	if node != nil {
-		tr.updateNode(node, k, v)
+		tr.replaceNode(node, tr.createNode(k, v, nil))
 	}
 	return node
 }
@@ -113,7 +109,7 @@ func (tr *Tree) Update(k container.Key, v container.Value) container.Element {
 func (tr *Tree) Upsert(k container.Key, v container.Value) (container.Element, bool) {
 	node, ok := tr.insertOrSearch(k, v)
 	if !ok {
-		tr.updateNode(node, k, v)
+		tr.replaceNode(node, tr.createNode(k, v, nil))
 	}
 	return node, ok
 }
@@ -196,6 +192,13 @@ func (tr *Tree) insertOrSearch(k container.Key, v container.Value) (node *treeNo
 	return
 }
 
+// Helps searches and deletes a node with a given key.
+func (tr *Tree) deleteAndSearch(k container.Key) *treeNode {
+	node := tr.searchNode(k)
+	tr.deleteNode(node)
+	return node
+}
+
 // Helps to creates an tree node with given key and value.
 func (tr *Tree) createNode(k container.Key, v container.Value, p *treeNode) *treeNode {
 	return &treeNode{
@@ -208,20 +211,25 @@ func (tr *Tree) createNode(k container.Key, v container.Value, p *treeNode) *tre
 	}
 }
 
-// Helps to deletes the node, returns the node that actually deleted.
-func (tr *Tree) deleteNode(node *treeNode) (d *treeNode) {
-	d = node
+// Helps to deletes the node.
+func (tr *Tree) deleteNode(d *treeNode) {
+	if d == nil {
+		return
+	}
 	if d.left != nil && d.right != nil {
+		// Replace the location of the deleted node with its successor
 		x := d.left
 		for x.right != nil {
 			x = x.right
 		}
-		tr.swap(d, x)
-		d = x
+		// Removes the node x.
+		tr.deleteNode(x)
+		// Replaced deleted node with x.
+		tr.replaceNode(d, x)
+		return
 	}
 
 	var c *treeNode
-
 	if d.left != nil {
 		c = d.left
 	} else {
@@ -242,45 +250,43 @@ func (tr *Tree) deleteNode(node *treeNode) (d *treeNode) {
 	if d.color == black {
 		tr.deleteBalance(c, d.parent)
 	}
-	// reset the unused field.
+
+	//reset the unused field.
 	d.left = nil
 	d.right = nil
 	d.parent = nil
 	d.color = -1
 
 	tr.len--
-	return d
 }
 
-// Help to creates a new tree node and instead of the node.
-func (tr *Tree) updateNode(node *treeNode, k container.Key, v container.Value) {
-	p := node.parent
+// Replace old with n0.
+func (tr *Tree) replaceNode(old, n0 *treeNode) {
+	n0.left = old.left
+	n0.right = old.right
+	n0.color = old.color
+	n0.parent = old.parent
 
-	n0 := tr.createNode(k, v, p)
-	n0.left = node.left
-	n0.right = node.right
-	n0.color = node.color
-
-	if node.left != nil {
-		node.left.parent = n0
+	if old.left != nil {
+		old.left.parent = n0
 	}
-	if node.right != nil {
-		node.right.parent = n0
+	if old.right != nil {
+		old.right.parent = n0
 	}
 
-	if p == nil {
+	if old.parent == nil {
 		tr.root = n0
-	} else if p.left == node {
-		p.left = n0
+	} else if old.parent.left == old {
+		old.parent.left = n0
 	} else {
-		p.right = n0
+		old.parent.right = n0
 	}
 
 	// reset the unused field.
-	node.left = nil
-	node.right = nil
-	node.parent = nil
-	node.color = -1
+	old.left = nil
+	old.right = nil
+	old.parent = nil
+	old.color = -1
 }
 
 // Search the node of a given key.
@@ -297,11 +303,6 @@ func (tr *Tree) searchNode(k container.Key) (node *treeNode) {
 		}
 	}
 	return
-}
-
-func (tr *Tree) swap(n1, n2 *treeNode) {
-	n1.key, n2.key = n2.key, n1.key
-	n1.value, n2.value = n2.value, n1.value
 }
 
 func (tr *Tree) insertBalance(node *treeNode) {
@@ -355,6 +356,7 @@ func (tr *Tree) insertBalance(node *treeNode) {
 	}
 }
 
+// node is the node that replaces deletion node.
 func (tr *Tree) deleteBalance(node *treeNode, parent *treeNode) {
 	n := node
 	p := parent
