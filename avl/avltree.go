@@ -28,23 +28,29 @@ type treeNode struct {
 	height int
 }
 
-// container.Key returns the key.
+// Key returns the key.
 func (n *treeNode) Key() container.Key {
 	return n.key
 }
 
-// container.Value returns the value.
+// Value returns the value.
 func (n *treeNode) Value() container.Value {
 	return n.value
 }
 
 // Left returns the left child of the TreeNode.
 func (n *treeNode) Left() container.TreeNode {
+	if n.left == nil {
+		return nil
+	}
 	return n.left
 }
 
 // Right returns the right child of the TreeNode.
 func (n *treeNode) Right() container.TreeNode {
+	if n.right == nil {
+		return nil
+	}
 	return n.right
 }
 
@@ -64,6 +70,9 @@ func New() *Tree {
 
 // Root returns the root node of the tree.
 func (tr *Tree) Root() container.TreeNode {
+	if tr.root == nil {
+		return nil
+	}
 	return tr.root
 }
 
@@ -82,17 +91,21 @@ func (tr *Tree) Insert(k container.Key, v container.Value) (container.Element, b
 // Delete removes and returns the element of a given key.
 // Returns nil if key not found.
 func (tr *Tree) Delete(k container.Key) container.Element {
-	d := tr.deleteAndSearch(k)
-	return d
+	node := tr.deleteAndSearch(k)
+	if node == nil {
+		return nil
+	}
+	return node
 }
 
 // Update updates an element with the given key and value, And returns the old element of key.
 // Returns nil if the key not be found.
 func (tr *Tree) Update(k container.Key, v container.Value) container.Element {
 	node, parent := tr.searchNode(k)
-	if node != nil {
-		tr.replaceNode(node, parent, tr.createNode(k, v))
+	if node == nil {
+		return nil
 	}
+	tr.replaceNode(node, parent, tr.createNode(k, v))
 	return node
 }
 
@@ -110,6 +123,9 @@ func (tr *Tree) Upsert(k container.Key, v container.Value) (container.Element, b
 // Returns nil if key not found.
 func (tr *Tree) Search(k container.Key) container.Element {
 	node, _ := tr.searchNode(k)
+	if node == nil {
+		return nil
+	}
 	return node
 }
 

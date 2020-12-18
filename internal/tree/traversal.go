@@ -24,7 +24,7 @@ func LDR(root container.TreeNode, f func(node container.TreeNode) bool) {
 	p := root
 
 	for !s.Empty() || (p != nil && !reflect.ValueOf(p).IsNil()) {
-		if !reflect.ValueOf(p).IsNil() {
+		if p != nil && !reflect.ValueOf(p).IsNil() {
 			s.Push(p)
 			p = p.Left()
 		} else {
@@ -50,7 +50,7 @@ func DLR(root container.TreeNode, f func(node container.TreeNode) bool) {
 	p := root
 
 	for !s.Empty() || (p != nil && !reflect.ValueOf(p).IsNil()) {
-		if !reflect.ValueOf(p).IsNil() {
+		if p != nil && !reflect.ValueOf(p).IsNil() {
 			if !f(p) {
 				return
 			}
@@ -84,7 +84,7 @@ func LRD(root container.TreeNode, f func(node container.TreeNode) bool) {
 
 	for !s.Empty() {
 		p = s.Pop().(container.TreeNode)
-		if reflect.ValueOf(p.Right()).IsNil() || p.Right() == lastVisit {
+		if (p.Right() == nil || reflect.ValueOf(p.Right()).IsNil()) || p.Right() == lastVisit {
 			if !f(p) {
 				return
 			}
@@ -93,7 +93,7 @@ func LRD(root container.TreeNode, f func(node container.TreeNode) bool) {
 		} else {
 			s.Push(p)
 			p = p.Right()
-			for !reflect.ValueOf(p).IsNil() {
+			for p != nil && !reflect.ValueOf(p).IsNil() {
 				s.Push(p)
 				p = p.Left()
 			}

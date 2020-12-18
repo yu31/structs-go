@@ -30,6 +30,25 @@ func init() {
 	}
 }
 
+type ComplexKey struct {
+	ID int64
+}
+
+func (k1 *ComplexKey) Compare(target container.Comparator) int {
+	k2 := target.(*ComplexKey)
+	if k1.ID < k2.ID {
+		return -1
+	}
+	if k1.ID > k2.ID {
+		return 1
+	}
+	return 0
+}
+
+type ComplexValue struct {
+	Name string
+}
+
 func TestContainer_Insert(t *testing.T) {
 	process := func(ctr container.Container) {
 		for k, v := range seeds {
@@ -58,10 +77,32 @@ func TestContainer_Insert(t *testing.T) {
 		}
 	}
 
-	// Test for all container implementation.
+	// Base test for all container implementation.
 	for name, f := range containers {
-		t.Run(name, func(t *testing.T) {
+		t.Run(name+"_base", func(t *testing.T) {
 			process(f())
+		})
+	}
+
+	boundary := func(ctr container.Container) {
+		// Test complex type of key and value.
+		ck := &ComplexKey{ID: 1024}
+		cv := &ComplexValue{Name: "developer"}
+		actual, ok := ctr.Insert(ck, cv)
+		require.True(t, ok)
+		require.Equal(t, actual.Key(), ck)
+		require.Equal(t, actual.Value(), cv)
+
+		actual, ok = ctr.Insert(ck, cv)
+		require.False(t, ok)
+		require.Equal(t, actual.Key(), ck)
+		require.Equal(t, actual.Value(), cv)
+	}
+
+	// Boundary test for all container implementation.
+	for name, f := range containers {
+		t.Run(name+"_boundary", func(t *testing.T) {
+			boundary(f())
 		})
 	}
 }
@@ -83,19 +124,45 @@ func TestContainer_Delete(t *testing.T) {
 			if n, ok := ele.(container.TreeNode); ok {
 				require.Nil(t, n.Left())
 				require.Nil(t, n.Right())
+				require.True(t, n.Left() == nil)
+				require.True(t, n.Right() == nil)
 			}
 			require.Nil(t, ctr.Delete(k))
+			require.True(t, ctr.Delete(k) == nil)
 		}
 
 		for k := range seeds {
 			require.Nil(t, ctr.Delete(k))
+			require.True(t, ctr.Delete(k) == nil)
 		}
 	}
 
-	// Test for all container implementation.
+	// Base test for all container implementation.
 	for name, f := range containers {
-		t.Run(name, func(t *testing.T) {
+		t.Run(name+"_base", func(t *testing.T) {
 			process(f())
+		})
+	}
+
+	boundary := func(ctr container.Container) {
+		// Test complex type of key and value.
+		ck := &ComplexKey{ID: 1024}
+		cv := &ComplexValue{Name: "developer"}
+		ctr.Insert(ck, cv)
+
+		ele := ctr.Delete(ck)
+		require.NotNil(t, ele)
+		require.Equal(t, ele.Key(), ck)
+		require.Equal(t, ele.Value(), cv)
+
+		require.Nil(t, ctr.Delete(ck))
+		require.True(t, ctr.Delete(ck) == nil)
+	}
+
+	// Boundary test for all container implementation.
+	for name, f := range containers {
+		t.Run(name+"_boundary", func(t *testing.T) {
+			boundary(f())
 		})
 	}
 }
@@ -104,6 +171,7 @@ func TestContainer_Search(t *testing.T) {
 	process := func(ctr container.Container) {
 		// Try to search key not exists.
 		require.Nil(t, ctr.Search(container.Int(0)))
+		require.True(t, ctr.Search(container.Int(0)) == nil)
 
 		for k, v := range seeds {
 			require.Nil(t, ctr.Search(k))
@@ -123,10 +191,31 @@ func TestContainer_Search(t *testing.T) {
 		}
 	}
 
-	// Test for all container implementation.
+	// Base test for all container implementation.
 	for name, f := range containers {
-		t.Run(name, func(t *testing.T) {
+		t.Run(name+"_base", func(t *testing.T) {
 			process(f())
+		})
+	}
+
+	boundary := func(ctr container.Container) {
+		// Test complex type of key and value.
+		ck := &ComplexKey{ID: 1024}
+		cv := &ComplexValue{Name: "developer"}
+		ctr.Insert(ck, cv)
+
+		require.NotNil(t, ctr.Search(ck))
+		require.Equal(t, ctr.Search(ck).Key(), ck)
+		require.Equal(t, ctr.Search(ck).Value(), cv)
+
+		require.Nil(t, ctr.Search(&ComplexKey{ID: 2048}))
+		require.True(t, ctr.Search(&ComplexKey{ID: 2048}) == nil)
+	}
+
+	// Boundary test for all container implementation.
+	for name, f := range containers {
+		t.Run(name+"_boundary", func(t *testing.T) {
+			boundary(f())
 		})
 	}
 }
@@ -137,6 +226,8 @@ func TestContainer_Update(t *testing.T) {
 		for k, v := range seeds {
 			require.Nil(t, ctr.Update(k, v+v))
 			require.Nil(t, ctr.Search(k))
+			require.True(t, ctr.Update(k, v+v) == nil)
+			require.True(t, ctr.Search(k) == nil)
 		}
 
 		// Insert data of seeds.
@@ -161,6 +252,8 @@ func TestContainer_Update(t *testing.T) {
 			if n, ok := ele.(container.TreeNode); ok {
 				require.Nil(t, n.Left())
 				require.Nil(t, n.Right())
+				require.True(t, n.Left() == nil)
+				require.True(t, n.Right() == nil)
 			}
 		}
 		for k, v := range seeds {
@@ -171,10 +264,37 @@ func TestContainer_Update(t *testing.T) {
 		}
 	}
 
-	// Test for all container implementation.
+	// Base test for all container implementation.
 	for name, f := range containers {
-		t.Run(name, func(t *testing.T) {
+		t.Run(name+"_base", func(t *testing.T) {
 			process(f())
+		})
+	}
+
+	boundary := func(ctr container.Container) {
+		// Test complex type of key and value.
+		ck := &ComplexKey{ID: 1024}
+		cv := &ComplexValue{Name: "developer"}
+		ctr.Insert(ck, cv)
+
+		cv2 := &ComplexValue{Name: "update-v2"}
+		ele := ctr.Update(ck, cv2)
+		require.NotNil(t, ele)
+		require.Equal(t, ele.Key(), ck)
+		require.Equal(t, ele.Value(), cv)
+
+		require.NotNil(t, ctr.Search(ck))
+		require.Equal(t, ctr.Search(ck).Key(), ck)
+		require.Equal(t, ctr.Search(ck).Value(), cv2)
+
+		require.Nil(t, ctr.Update(&ComplexKey{ID: 2048}, nil))
+		require.True(t, ctr.Update(&ComplexKey{ID: 2048}, nil) == nil)
+	}
+
+	// Boundary test for all container implementation.
+	for name, f := range containers {
+		t.Run(name+"_boundary", func(t *testing.T) {
+			boundary(f())
 		})
 	}
 }
@@ -184,6 +304,7 @@ func TestContainer_Upsert(t *testing.T) {
 		// The key not exists, Upsert same as the Insert
 		for k, v := range seeds {
 			require.Nil(t, ctr.Search(k))
+			require.True(t, ctr.Search(k) == nil)
 			ele, ok := ctr.Upsert(k, v)
 			require.True(t, ok)
 			require.NotNil(t, ele)
@@ -216,6 +337,8 @@ func TestContainer_Upsert(t *testing.T) {
 			if n, ok := ele.(container.TreeNode); ok {
 				require.Nil(t, n.Left())
 				require.Nil(t, n.Right())
+				require.True(t, n.Left() == nil)
+				require.True(t, n.Right() == nil)
 			}
 		}
 		for k, v := range seeds {
@@ -226,10 +349,39 @@ func TestContainer_Upsert(t *testing.T) {
 		}
 	}
 
-	// Test for all container implementation.
+	// Base test for all container implementation.
 	for name, f := range containers {
-		t.Run(name, func(t *testing.T) {
+		t.Run(name+"_base", func(t *testing.T) {
 			process(f())
+		})
+	}
+
+	boundary := func(ctr container.Container) {
+		// Test complex type of key and value.
+		ck := &ComplexKey{ID: 1024}
+		cv := &ComplexValue{Name: "developer"}
+		ele, ok := ctr.Upsert(ck, cv)
+		require.True(t, ok)
+		require.NotNil(t, ele)
+		require.Equal(t, ele.Key(), ck)
+		require.Equal(t, ele.Value(), cv)
+
+		cv2 := &ComplexValue{Name: "update-v2"}
+		ele, ok = ctr.Upsert(ck, cv2)
+		require.False(t, ok)
+		require.NotNil(t, ele)
+		require.Equal(t, ele.Key(), ck)
+		require.Equal(t, ele.Value(), cv)
+
+		require.NotNil(t, ctr.Search(ck))
+		require.Equal(t, ctr.Search(ck).Key(), ck)
+		require.Equal(t, ctr.Search(ck).Value(), cv2)
+	}
+
+	// Boundary test for all container implementation.
+	for name, f := range containers {
+		t.Run(name+"_boundary", func(t *testing.T) {
+			boundary(f())
 		})
 	}
 }
@@ -306,9 +458,9 @@ func TestContainer_Len(t *testing.T) {
 		require.Equal(t, ctr.Len(), 0)
 	}
 
-	// Test for all container implementation.
+	// Base test for all container implementation.
 	for name, f := range containers {
-		t.Run(name, func(t *testing.T) {
+		t.Run(name+"_base", func(t *testing.T) {
 			process(f())
 		})
 	}

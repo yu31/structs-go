@@ -26,7 +26,7 @@ func Range(root container.TreeNode, start container.Key, boundary container.Key,
 	s := stack.Default()
 	p := root
 	for !s.Empty() || (p != nil && !reflect.ValueOf(p).IsNil()) {
-		if !reflect.ValueOf(p).IsNil() {
+		if p != nil && !reflect.ValueOf(p).IsNil() {
 			if start != nil && p.Key().Compare(start) == -1 {
 				p = p.Right()
 				continue

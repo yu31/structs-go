@@ -13,10 +13,17 @@ import (
 func TestContainerTree_Root(t *testing.T) {
 	process := func(tr container.Tree) {
 		require.Nil(t, tr.Root())
+		require.True(t, tr.Root() == nil)
+
 		tr.Insert(container.Int64(3), "1024")
 		require.NotNil(t, tr.Root())
 		require.Equal(t, tr.Root().Key(), container.Int64(3))
 		require.Equal(t, tr.Root().Value(), "1024")
+
+		tr.Delete(container.Int64(3))
+
+		require.Nil(t, tr.Root())
+		require.True(t, tr.Root() == nil)
 	}
 
 	// Test for all tree implementation.
