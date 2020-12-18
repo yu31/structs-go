@@ -30,6 +30,10 @@ type Searcher interface {
 	// And return until the end if the boundary is nil.
 	Range(start Key, boundary Key, f func(ele Element) bool)
 
+	// Reverse is similar to the Range method. But it iteration element in reverse.
+	// If f returns false, range stops the iteration.
+	Reverse(start Key, boundary Key, f func(ele Element) bool)
+
 	// LastLT searches for the last element that less than the key.
 	LastLT(k Key) Element
 

@@ -71,3 +71,27 @@ func searchRangeByIter(ctr container.Container, start container.Key, boundary co
 	}
 	return result
 }
+
+func searchReceive(ctr container.Container, start container.Key, boundary container.Key) []container.Element {
+	var result []container.Element
+
+	ctr.Reverse(start, boundary, func(ele container.Element) bool {
+		result = append(result, ele)
+		return true
+	})
+	return result
+}
+
+func reverseElementSlice(elements []container.Element) []container.Element {
+	if len(elements) == 0 {
+		return nil
+	}
+	result := make([]container.Element, len(elements))
+	copy(result, elements)
+
+	length := len(result)
+	for i := 0; i < length/2; i++ {
+		result[i], result[length-1-i] = result[length-1-i], result[i]
+	}
+	return result
+}

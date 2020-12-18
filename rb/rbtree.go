@@ -146,6 +146,14 @@ func (tr *Tree) Range(start container.Key, boundary container.Key, f func(ele co
 	})
 }
 
+// Reverse is similar to the Range method. But it iteration element in reverse.
+// If f returns false, range stops the iteration.
+func (tr *Tree) Reverse(start container.Key, boundary container.Key, f func(ele container.Element) bool) {
+	tree.Reverse(tr.root, start, boundary, func(node container.TreeNode) bool {
+		return f(node)
+	})
+}
+
 // LastLT searches for the last node that less than the key.
 func (tr *Tree) LastLT(k container.Key) container.Element {
 	return tree.LastLT(tr.root, k)

@@ -100,3 +100,28 @@ func LRD(root container.TreeNode, f func(node container.TreeNode) bool) {
 		}
 	}
 }
+
+// RDL calls f sequentially each TreeNode by reverse-order traversal.
+// If f returns false, range stops the iteration.
+// The order: Right -> Middle -> Left
+func RDL(root container.TreeNode, f func(node container.TreeNode) bool) {
+	if root == nil {
+		return
+	}
+	s := stack.Default()
+	p := root
+	// Right -> Middle -> Left
+	for !s.Empty() || (p != nil && !reflect.ValueOf(p).IsNil()) {
+		if p != nil && !reflect.ValueOf(p).IsZero() {
+			s.Push(p)
+			p = p.Right()
+		} else {
+			n := s.Pop().(container.TreeNode)
+			p = n.Left()
+
+			if !f(n) {
+				return
+			}
+		}
+	}
+}

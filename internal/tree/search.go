@@ -22,9 +22,9 @@ func Range(root container.TreeNode, start container.Key, boundary container.Key,
 	if root == nil {
 		return
 	}
-
 	s := stack.Default()
 	p := root
+	// Left -> Middle -> Right
 	for !s.Empty() || (p != nil && !reflect.ValueOf(p).IsNil()) {
 		if p != nil && !reflect.ValueOf(p).IsNil() {
 			if start != nil && p.Key().Compare(start) == -1 {
@@ -49,14 +49,48 @@ func Range(root container.TreeNode, start container.Key, boundary container.Key,
 	}
 }
 
+// Reverse calls f sequentially reverse each TreeNode present in the Tree.
+// If f returns false, range stops the iteration.
+//
+// The range is start <= x < boundary.
+// The elements will return from the beginning if start is nil,
+// And return until the end if the boundary is nil.
+func Reverse(root container.TreeNode, start container.Key, boundary container.Key, f func(node container.TreeNode) bool) {
+	if root == nil {
+		return
+	}
+	s := stack.Default()
+	p := root
+	// Right -> Middle -> Left
+	for !s.Empty() || (p != nil && !reflect.ValueOf(p).IsNil()) {
+		if p != nil && !reflect.ValueOf(p).IsZero() {
+			if start != nil && p.Key().Compare(start) == -1 {
+				p = p.Right()
+				continue
+			}
+			if boundary != nil && p.Key().Compare(boundary) != -1 {
+				p = p.Left()
+				continue
+			}
+			s.Push(p)
+			p = p.Right()
+		} else {
+			n := s.Pop().(container.TreeNode)
+			p = n.Left()
+
+			if !f(n) {
+				return
+			}
+		}
+	}
+}
+
 // LastLT searches for the last node that less than the key.
 func LastLT(root container.TreeNode, key container.Key) container.TreeNode {
 	if root == nil || key == nil {
 		return nil
 	}
-
 	var n container.TreeNode
-
 	p := root
 	for p != nil && !reflect.ValueOf(p).IsNil() {
 		cmp := key.Compare(p.Key())
@@ -67,7 +101,6 @@ func LastLT(root container.TreeNode, key container.Key) container.TreeNode {
 			p = p.Left()
 		}
 	}
-
 	return n
 }
 
@@ -76,9 +109,7 @@ func LastLE(root container.TreeNode, key container.Key) container.TreeNode {
 	if root == nil || key == nil {
 		return nil
 	}
-
 	var n container.TreeNode
-
 	p := root
 	for p != nil && !reflect.ValueOf(p).IsNil() {
 		cmp := key.Compare(p.Key())
@@ -92,7 +123,6 @@ func LastLE(root container.TreeNode, key container.Key) container.TreeNode {
 			break
 		}
 	}
-
 	return n
 }
 
@@ -101,9 +131,7 @@ func FirstGT(root container.TreeNode, key container.Key) container.TreeNode {
 	if root == nil || key == nil {
 		return nil
 	}
-
 	var n container.TreeNode
-
 	p := root
 	for p != nil && !reflect.ValueOf(p).IsNil() {
 		cmp := key.Compare(p.Key())
@@ -114,7 +142,6 @@ func FirstGT(root container.TreeNode, key container.Key) container.TreeNode {
 			p = p.Right()
 		}
 	}
-
 	return n
 }
 
@@ -123,9 +150,7 @@ func FirstGE(root container.TreeNode, key container.Key) container.TreeNode {
 	if root == nil || key == nil {
 		return nil
 	}
-
 	var n container.TreeNode
-
 	p := root
 	for p != nil && !reflect.ValueOf(p).IsNil() {
 		cmp := key.Compare(p.Key())
@@ -139,6 +164,5 @@ func FirstGE(root container.TreeNode, key container.Key) container.TreeNode {
 			break
 		}
 	}
-
 	return n
 }

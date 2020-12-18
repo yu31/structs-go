@@ -260,6 +260,13 @@ func (sl *List) Range(start container.Key, boundary container.Key, f func(ele co
 	}
 }
 
+// Reverse is similar to the Range method. But it iteration element in reverse.
+// If f returns false, range stops the iteration.
+func (sl *List) Reverse(start container.Key, boundary container.Key, f func(ele container.Element) bool) {
+	// TODO:
+	panic("skiplist: Reverse method not implemented")
+}
+
 // LastLT searches for the last node that less than the key.
 func (sl *List) LastLT(k container.Key) container.Element {
 	return sl.searchLastLT(k)

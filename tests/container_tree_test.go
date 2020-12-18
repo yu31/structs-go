@@ -141,3 +141,40 @@ func TestContainerTree_LRD(t *testing.T) {
 		})
 	}
 }
+
+func TestContainerTree_Reverse(t *testing.T) {
+	process := func(tr container.Tree) {
+		// Insert seeds in random order
+		for _, k := range shuffleSeeds(searchSeeds) {
+			tr.Insert(k, int64(k*2+1))
+		}
+
+		var r1 []container.Element
+		tree.RDL(tr.Root(), func(n container.TreeNode) bool {
+			r1 = append(r1, n)
+			return true
+		})
+
+		var f func(node container.TreeNode)
+		var r2 []container.Element
+		f = func(node container.TreeNode) {
+			if node == nil || reflect.ValueOf(node).IsNil() {
+				return
+			}
+			f(node.Right())
+			r2 = append(r2, node)
+			f(node.Left())
+		}
+		f(tr.Root())
+
+		require.Equal(t, r1, r2)
+	}
+
+	// Test for all tree implementation.
+	for name, f := range trees {
+		t.Run(name, func(t *testing.T) {
+			process(f())
+		})
+		break
+	}
+}
