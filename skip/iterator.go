@@ -32,7 +32,6 @@ func newIterator(sl *List, start container.Key, boundary container.Key) *Iterato
 		} else {
 			node = sl.searchFirstGE(start)
 		}
-
 		if boundary != nil {
 			end = sl.searchFirstGE(boundary)
 		}
@@ -53,15 +52,13 @@ func (iter *Iterator) Valid() bool {
 	return true
 }
 
-// Next returns a Element and moved the iterator to the next Element.
+// Next returns a element and moved the iterator to the next element.
 // Returns nil if no more elements.
 func (iter *Iterator) Next() container.Element {
 	if !iter.Valid() {
 		return nil
 	}
-
 	n := iter.node
 	iter.node = iter.node.next[0]
-
 	return n
 }

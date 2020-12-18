@@ -69,22 +69,21 @@ func (tr *Tree) Len() int {
 	return tr.len
 }
 
-// Insert inserts and returns an Element with given key and value if key doesn't exists.
-// Or else, returns the existing Element for the key if present.
-// The bool result is true if an Element was inserted, false if searched.
+// Insert inserts a new element if the key doesn't exist, or returns the existing element for the key if present.
+// The bool result is true if an element was inserted, false if searched.
 func (tr *Tree) Insert(k container.Key, v container.Value) (container.Element, bool) {
 	node, _, ok := tr.insertOrSearch(k, v)
 	return node, ok
 }
 
-// Delete removes and returns the Element of a given key.
-// Returns nil if not found.
+// Delete removes and returns the element of a given key.
+// Returns nil if key not found.
 func (tr *Tree) Delete(k container.Key) container.Element {
 	d := tr.deleteAndSearch(k)
 	return d
 }
 
-// Update updates an Element with the given key and value, And returns the old element.
+// Update updates an element with the given key and value, And returns the old element of key.
 // Returns nil if the key not be found.
 func (tr *Tree) Update(k container.Key, v container.Value) container.Element {
 	node, parent := tr.searchNode(k)
@@ -94,11 +93,8 @@ func (tr *Tree) Update(k container.Key, v container.Value) container.Element {
 	return node
 }
 
-// Upsert inserts or updates an Element by giving key and value.
-// The bool result is true if an Element was inserted, false if an Element was updated.
-//
-// The operation are same as the Insert method if key not found,
-// And are same as the Update method if key exists.
+// Upsert inserts or updates an element by giving key and value.
+// The bool result is true if an element was inserted, false if an element was updated.
 func (tr *Tree) Upsert(k container.Key, v container.Value) (container.Element, bool) {
 	node, parent, ok := tr.insertOrSearch(k, v)
 	if !ok {
@@ -107,7 +103,7 @@ func (tr *Tree) Upsert(k container.Key, v container.Value) (container.Element, b
 	return node, ok
 }
 
-// Search searches the Element of a given key.
+// Search searches the element of a given key.
 // Returns nil if key not found.
 func (tr *Tree) Search(k container.Key) container.Element {
 	node, _ := tr.searchNode(k)
@@ -188,7 +184,7 @@ func (tr *Tree) insertOrSearch(k container.Key, v container.Value) (node *treeNo
 	return
 }
 
-// Helps searches and deletes a node with a given key.
+// Searches and deletes a node of a given key.
 func (tr *Tree) deleteAndSearch(k container.Key) *treeNode {
 	node, parent := tr.searchNode(k)
 	if node == nil {
@@ -198,7 +194,7 @@ func (tr *Tree) deleteAndSearch(k container.Key) *treeNode {
 	return node
 }
 
-// Helps to creates an tree node with given key and value.
+// Creates a new node with the giving key and value.
 func (tr *Tree) createNode(k container.Key, v container.Value) *treeNode {
 	return &treeNode{
 		key:   k,
@@ -208,7 +204,7 @@ func (tr *Tree) createNode(k container.Key, v container.Value) *treeNode {
 	}
 }
 
-// Helps to deletes the node.
+// Deletes a node.
 func (tr *Tree) deleteNode(d *treeNode, parent *treeNode) {
 	if d.left != nil && d.right != nil {
 		// Replace the location of the deleted node with its successor

@@ -15,7 +15,7 @@ import (
 // Range calls f sequentially each TreeNode present in the Tree.
 // If f returns false, range stops the iteration.
 //
-// The elements range is start <= x < boundary.
+// The range is start <= x < boundary.
 // The elements will return from the beginning if start is nil,
 // And return until the end if the boundary is nil.
 func Range(root container.TreeNode, start container.Key, boundary container.Key, f func(node container.TreeNode) bool) {

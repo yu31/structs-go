@@ -33,14 +33,14 @@ func init() {
 func TestContainer_Insert(t *testing.T) {
 	process := func(ctr container.Container) {
 		for k, v := range seeds {
-			// The key not exists before, Insert was creates an new Element.
+			// The key not exists before, Insert was creates an new element.
 			ele, ok := ctr.Insert(k, v)
 			require.True(t, ok)
 			require.NotNil(t, ele)
 			require.Equal(t, ele.Key(), k)
 			require.Equal(t, ele.Value(), v)
 
-			// The key already exists, Insert was return the present Element.
+			// The key already exists, Insert was return the present element.
 			ele, ok = ctr.Insert(k, v+v)
 			require.False(t, ok)
 			require.NotNil(t, ele)

@@ -61,16 +61,15 @@ func (sl *List) Len() int {
 	return sl.lens[0]
 }
 
-// Insert inserts and returns an Element with given key and value if key doesn't exists.
-// Or else, returns the existing Element for the key if present.
-// The bool result is true if an Element was inserted, false if searched.
+// Insert inserts a new element if the key doesn't exist, or returns the existing element for the key if present.
+// The bool result is true if an element was inserted, false if searched.
 func (sl *List) Insert(k container.Key, v container.Value) (container.Element, bool) {
 	level := sl.chooseLevel()
 	if level > sl.level {
 		sl.level = level
 	}
 
-	updates := make([]*listNode, sl.level+1)
+	previous := make([]*listNode, sl.level+1)
 	p := sl.head
 	for i := sl.level; i >= 0; i-- {
 		for p.next[i] != nil && p.next[i].key.Compare(k) == -1 {
@@ -80,20 +79,20 @@ func (sl *List) Insert(k container.Key, v container.Value) (container.Element, b
 			// The key already exists. Not allowed duplicates.
 			return p.next[i], false
 		}
-		updates[i] = p
+		previous[i] = p
 	}
 
 	n := sl.createNode(k, v, level)
 	for i := 0; i <= level; i++ {
-		n.next[i] = updates[i].next[i]
-		updates[i].next[i] = n
+		n.next[i] = previous[i].next[i]
+		previous[i].next[i] = n
 		sl.lens[i]++
 	}
 	return n, true
 }
 
-// Delete removes and returns the Element of a given key.
-// Returns nil if not found.
+// Delete removes and returns the element of a given key.
+// Returns nil if key not found.
 func (sl *List) Delete(k container.Key) container.Element {
 	var d *listNode
 	p := sl.head
@@ -121,12 +120,12 @@ func (sl *List) Delete(k container.Key) container.Element {
 	return d
 }
 
-// Update updates an Element with the given key and value, And returns the old element.
+// Update updates an element with the given key and value, And returns the old element of key.
 // Returns nil if the key not be found.
 func (sl *List) Update(k container.Key, v container.Value) container.Element {
 	var node *listNode
 
-	updates := make([]*listNode, sl.level+1)
+	previous := make([]*listNode, sl.level+1)
 	p := sl.head
 	for i := sl.level; i >= 0; i-- {
 		for p.next[i] != nil && p.next[i].key.Compare(k) == -1 {
@@ -135,7 +134,7 @@ func (sl *List) Update(k container.Key, v container.Value) container.Element {
 		if p.next[i] != nil && p.next[i].key.Compare(k) == 0 {
 			node = p.next[i]
 		}
-		updates[i] = p
+		previous[i] = p
 
 	}
 	if node == nil {
@@ -149,9 +148,9 @@ func (sl *List) Update(k container.Key, v container.Value) container.Element {
 		next:  node.next,
 	}
 
-	for i := 0; i < len(updates); i++ {
-		if updates[i] != nil && updates[i].next[i] == node {
-			updates[i].next[i] = n0
+	for i := 0; i < len(previous); i++ {
+		if previous[i] != nil && previous[i].next[i] == node {
+			previous[i].next[i] = n0
 		}
 	}
 
@@ -160,15 +159,12 @@ func (sl *List) Update(k container.Key, v container.Value) container.Element {
 	return node
 }
 
-// Upsert inserts or updates an Element by giving key and value.
-// The bool result is true if an Element was inserted, false if an Element was updated.
-//
-// The operation are same as the Insert method if key not found,
-// And are same as the Update method if key exists.
+// Upsert inserts or updates an element by giving key and value.
+// The bool result is true if an element was inserted, false if an element was updated.
 func (sl *List) Upsert(k container.Key, v container.Value) (container.Element, bool) {
 	var node *listNode
 
-	updates := make([]*listNode, maxLevel+1)
+	previous := make([]*listNode, maxLevel+1)
 	p := sl.head
 	for i := sl.level; i >= 0; i-- {
 		for p.next[i] != nil && p.next[i].key.Compare(k) == -1 {
@@ -177,7 +173,7 @@ func (sl *List) Upsert(k container.Key, v container.Value) (container.Element, b
 		if p.next[i] != nil && p.next[i].key.Compare(k) == 0 {
 			node = p.next[i]
 		}
-		updates[i] = p
+		previous[i] = p
 	}
 
 	if node == nil {
@@ -185,15 +181,15 @@ func (sl *List) Upsert(k container.Key, v container.Value) (container.Element, b
 		level := sl.chooseLevel()
 		if level > sl.level {
 			for i := level; i > sl.level; i-- {
-				updates[i] = sl.head
+				previous[i] = sl.head
 			}
 			sl.level = level
 		}
 
 		node = sl.createNode(k, v, level)
 		for i := 0; i <= level; i++ {
-			node.next[i] = updates[i].next[i]
-			updates[i].next[i] = node
+			node.next[i] = previous[i].next[i]
+			previous[i].next[i] = node
 			sl.lens[i]++
 		}
 		return node, true
@@ -206,9 +202,9 @@ func (sl *List) Upsert(k container.Key, v container.Value) (container.Element, b
 		next:  node.next,
 	}
 
-	for i := 0; i < len(updates); i++ {
-		if updates[i] != nil && updates[i].next[i] == node {
-			updates[i].next[i] = n0
+	for i := 0; i < len(previous); i++ {
+		if previous[i] != nil && previous[i].next[i] == node {
+			previous[i].next[i] = n0
 		}
 	}
 
@@ -217,7 +213,7 @@ func (sl *List) Upsert(k container.Key, v container.Value) (container.Element, b
 	return node, false
 }
 
-// Search searches the Element of a given key.
+// Search searches the element of a given key.
 // Returns nil if key not found.
 func (sl *List) Search(k container.Key) container.Element {
 	p := sl.head
@@ -250,7 +246,6 @@ func (sl *List) Range(start container.Key, boundary container.Key, f func(ele co
 		} else {
 			node = sl.searchFirstGE(start)
 		}
-
 		if boundary != nil {
 			end = sl.searchFirstGE(boundary)
 		}
@@ -285,6 +280,7 @@ func (sl *List) FirstGE(k container.Key) container.Element {
 	return sl.searchFirstGE(k)
 }
 
+// Creates a new node with the giving key and value.
 func (sl *List) createNode(k container.Key, v container.Value, level int) *listNode {
 	return &listNode{
 		key:   k,

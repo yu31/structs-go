@@ -72,22 +72,21 @@ func (tr *Tree) Len() int {
 	return tr.len
 }
 
-// Insert inserts and returns an Element with given key and value if key doesn't exists.
-// Or else, returns the existing Element for the key if present.
-// The bool result is true if an Element was inserted, false if searched.
+// Insert inserts a new element if the key doesn't exist, or returns the existing element for the key if present.
+// The bool result is true if an element was inserted, false if searched.
 func (tr *Tree) Insert(k container.Key, v container.Value) (container.Element, bool) {
 	_, node, ok := tr.insertOrSearch(k, v)
 	return node, ok
 }
 
-// Delete removes and returns the Element of a given key.
-// Returns nil if not found.
+// Delete removes and returns the element of a given key.
+// Returns nil if key not found.
 func (tr *Tree) Delete(k container.Key) container.Element {
 	d := tr.deleteAndSearch(k)
 	return d
 }
 
-// Update updates an Element with the given key and value, And returns the old element.
+// Update updates an element with the given key and value, And returns the old element of key.
 // Returns nil if the key not be found.
 func (tr *Tree) Update(k container.Key, v container.Value) container.Element {
 	node, parent := tr.searchNode(k)
@@ -97,11 +96,8 @@ func (tr *Tree) Update(k container.Key, v container.Value) container.Element {
 	return node
 }
 
-// Upsert inserts or updates an Element by giving key and value.
-// The bool result is true if an Element was inserted, false if an Element was updated.
-//
-// The operation are same as the Insert method if key not found,
-// And are same as the Update method if key exists.
+// Upsert inserts or updates an element by giving key and value.
+// The bool result is true if an element was inserted, false if an element was updated.
 func (tr *Tree) Upsert(k container.Key, v container.Value) (container.Element, bool) {
 	parent, node, ok := tr.insertOrSearch(k, v)
 	if !ok {
@@ -110,7 +106,7 @@ func (tr *Tree) Upsert(k container.Key, v container.Value) (container.Element, b
 	return node, ok
 }
 
-// Search searches the Element of a given key.
+// Search searches the element of a given key.
 // Returns nil if key not found.
 func (tr *Tree) Search(k container.Key) container.Element {
 	node, _ := tr.searchNode(k)
@@ -154,7 +150,7 @@ func (tr *Tree) FirstGE(k container.Key) container.Element {
 // Or else, returns the exists node and its parent node for the key if present.
 // The ok result is true if the node was inserted, false if searched.
 func (tr *Tree) insertOrSearch(k container.Key, v container.Value) (parent *treeNode, node *treeNode, ok bool) {
-	tr.root, node, parent, ok = tr.insertBalance(tr.root, k, v)
+	tr.root, node, parent, ok = tr.insertWithBalance(tr.root, k, v)
 	if !ok {
 		return
 	}
@@ -162,10 +158,10 @@ func (tr *Tree) insertOrSearch(k container.Key, v container.Value) (parent *tree
 	return
 }
 
-// Helps searches and deletes a node with a given key.
+// Searches and deletes a node of a given key.
 func (tr *Tree) deleteAndSearch(k container.Key) *treeNode {
 	var d *treeNode
-	tr.root, d = tr.deleteBalance(tr.root, k)
+	tr.root, d = tr.deleteWithBalance(tr.root, k)
 	if d == nil {
 		return nil
 	}
@@ -179,7 +175,7 @@ func (tr *Tree) deleteAndSearch(k container.Key) *treeNode {
 	return d
 }
 
-// Helps to creates an tree node with given key and value.
+// Creates a new node with the giving key and value.
 func (tr *Tree) createNode(k container.Key, v container.Value) *treeNode {
 	return &treeNode{
 		key:    k,
@@ -231,8 +227,11 @@ func (tr *Tree) searchNode(k container.Key) (node *treeNode, parent *treeNode) {
 	return
 }
 
-// ok is false means no new node created.
-func (tr *Tree) insertBalance(r0 *treeNode, k container.Key, v container.Value) (root *treeNode, node *treeNode, parent *treeNode, ok bool) {
+// Inserts a node and re-balance during insertion.
+// Returns root node, new node, parent node of new node if key not exists.
+// And returns root node, node of key, parent node of key if key already exists.
+// Thus, ok is false means no new node created.
+func (tr *Tree) insertWithBalance(r0 *treeNode, k container.Key, v container.Value) (root *treeNode, node *treeNode, parent *treeNode, ok bool) {
 	if r0 == nil {
 		node = tr.createNode(k, v)
 		root = node
@@ -264,10 +263,10 @@ func (tr *Tree) insertBalance(r0 *treeNode, k container.Key, v container.Value) 
 
 	if cmp == -1 {
 		// Insert into the left subtree.
-		root.left, node, parent, ok = tr.insertBalance(root.left, k, v)
+		root.left, node, parent, ok = tr.insertWithBalance(root.left, k, v)
 	} else {
 		// Insert into the right subtree
-		root.right, node, parent, ok = tr.insertBalance(root.right, k, v)
+		root.right, node, parent, ok = tr.insertWithBalance(root.right, k, v)
 	}
 
 	if ok {
@@ -276,8 +275,8 @@ func (tr *Tree) insertBalance(r0 *treeNode, k container.Key, v container.Value) 
 	return
 }
 
-// return (root root, delete node).
-func (tr *Tree) deleteBalance(r0 *treeNode, k container.Key) (root *treeNode, d *treeNode) {
+// Deletes a node of key and re-balance during deletion, returns root node and deleted node.
+func (tr *Tree) deleteWithBalance(r0 *treeNode, k container.Key) (root *treeNode, d *treeNode) {
 	root = r0
 	if root == nil {
 		// The key not exists.
@@ -287,10 +286,10 @@ func (tr *Tree) deleteBalance(r0 *treeNode, k container.Key) (root *treeNode, d 
 	cmp := k.Compare(root.key)
 	if cmp == -1 {
 		// delete from the left subtree.
-		root.left, d = tr.deleteBalance(root.left, k)
+		root.left, d = tr.deleteWithBalance(root.left, k)
 	} else if cmp == 1 {
 		// delete from the right subtree.
-		root.right, d = tr.deleteBalance(root.right, k)
+		root.right, d = tr.deleteWithBalance(root.right, k)
 	} else {
 		d = root
 		if root.left != nil && root.right != nil {
@@ -301,7 +300,7 @@ func (tr *Tree) deleteBalance(r0 *treeNode, k container.Key) (root *treeNode, d 
 				for x.right != nil {
 					x = x.right
 				}
-				x.left, _ = tr.deleteBalance(root.left, x.key)
+				x.left, _ = tr.deleteWithBalance(root.left, x.key)
 				x.right = root.right
 			} else {
 				// Replace the location of the deleted node with its successor
@@ -309,7 +308,7 @@ func (tr *Tree) deleteBalance(r0 *treeNode, k container.Key) (root *treeNode, d 
 				for x.left != nil {
 					x = x.left
 				}
-				x.right, _ = tr.deleteBalance(root.right, x.key)
+				x.right, _ = tr.deleteWithBalance(root.right, x.key)
 				x.left = root.left
 			}
 			x.height = tr.calculateHeight(x)

@@ -16,8 +16,8 @@ var _ container.Iterator = (*Iterator)(nil)
 
 // Iterator to iteration return element.
 //
-// The element range is start <= x < boundary.
-// The element will return from the beginning if start is nil,
+// The range is start <= x < boundary.
+// The elements will return from the beginning if start is nil,
 // And return until the end if the boundary is nil.
 //
 // The Iterator return element with in-order traversal,
@@ -39,7 +39,6 @@ func NewIterator(root container.TreeNode, start container.Key, boundary containe
 		start:    start,
 		boundary: boundary,
 	}
-
 	return it
 }
 
@@ -48,7 +47,7 @@ func (it *Iterator) Valid() bool {
 	return !it.s.Empty()
 }
 
-// Next returns a Element and moved the iterator to the next Element.
+// Next returns a element and moved the iterator to the next Element.
 // Returns nil if no more elements.
 func (it *Iterator) Next() container.Element {
 	if it.s.Empty() {
@@ -59,7 +58,6 @@ func (it *Iterator) Next() container.Element {
 	n := p
 
 	fillStack(p.Right(), it.start, it.boundary, it.s)
-
 	return n
 }
 
