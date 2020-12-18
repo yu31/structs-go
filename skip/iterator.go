@@ -11,11 +11,11 @@ import (
 
 var _ container.Iterator = (*Iterator)(nil)
 
-// Iterator to iteration return element.
+// Iter creates an Iterator positioned on the first element that key >= start key.
+// If the start key is nil, it will return from the beginning.
+// It yields only keys that < boundary. If boundary is nil, iteration until the end.
 //
-// The element range is start <= x < boundary.
-// The element will return from the beginning if start is nil,
-// And return until the end if the boundary is nil.
+// Thus, the ranges is: start <= x < boundary.
 type Iterator struct {
 	node *listNode
 	end  *listNode

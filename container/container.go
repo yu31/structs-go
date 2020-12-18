@@ -20,35 +20,9 @@ type Element interface {
 	Value() Value
 }
 
-// Searcher declares an interface to performs query in a Container.
-type Searcher interface {
-	// Range calls f sequentially each TreeNode present in the Container.
-	// If f returns false, range stops the iteration.
-	//
-	// The range is start <= x < boundary.
-	// The elements will return from the beginning if start is nil,
-	// And return until the end if the boundary is nil.
-	Range(start Key, boundary Key, f func(ele Element) bool)
-
-	// Reverse is similar to the Range method. But it iteration element in reverse.
-	// If f returns false, range stops the iteration.
-	Reverse(start Key, boundary Key, f func(ele Element) bool)
-
-	// LastLT searches for the last element that less than the key.
-	LastLT(k Key) Element
-
-	// LastLE search for the last element that less than or equal to the key.
-	LastLE(k Key) Element
-
-	// FirstGT search for the first element that greater than to the key.
-	FirstGT(k Key) Element
-
-	// FirstGE search for the first element that greater than or equal to the key.
-	FirstGE(k Key) Element
-}
-
 // Container declares an data container interface.
 type Container interface {
+	Retriever
 	Searcher
 
 	// Len returns the number of elements.
@@ -76,13 +50,6 @@ type Container interface {
 	// Search searches the element of a given key.
 	// Returns nil if key not found.
 	Search(k Key) Element
-
-	// Iter creates an iterator to the iteration return element.
-	//
-	// The range is start <= x < boundary.
-	// The elements will return from the beginning if start is nil,
-	// And return until the end if the boundary is nil.
-	Iter(start Key, boundary Key) Iterator
 }
 
 // The iterator is an interface for iteration return element.
@@ -94,4 +61,48 @@ type Iterator interface {
 	// Next returns a element and moved the iterator to the next element.
 	// Returns nil if no more elements.
 	Next() Element
+}
+
+// Retriever declares an interface for traversal Element.
+type Retriever interface {
+	// Range calls f sequentially each Element present in the Container.
+	// If f returns false, Range stops the iteration.
+	//
+	// The range is start <= x < boundary.
+	// The elements will return from the beginning if start is nil,
+	// And return until the end if the boundary is nil.
+	Range(start Key, boundary Key, f func(ele Element) bool)
+
+	// Reverse is similar to the Range method. And reverse iteration element.
+	// If f returns false, Reverse stops the iteration.
+	Reverse(start Key, boundary Key, f func(ele Element) bool)
+
+	// Iter creates an Iterator positioned on the first element that key >= start key.
+	// If the start key is nil, it will return from the beginning.
+	// It yields only keys that < boundary. If boundary is nil, iteration until the end.
+	//
+	// Thus, the ranges is: start <= x < boundary.
+	Iter(start Key, boundary Key) Iterator
+
+	// Iter creates an reversed Iterator positioned on the first element that key >= start key.
+	// If the start key is nil, it will return from the beginning.
+	// It yields only keys that < boundary. If boundary is nil, iteration until the end.
+	//
+	// Thus, the ranges is: start <= x < boundary.
+	IterReverse(start Key, boundary Key) Iterator
+}
+
+// Searcher declares an interface to performs query operation in a Container.
+type Searcher interface {
+	// LastLT searches for the last element that less than the key.
+	LastLT(k Key) Element
+
+	// LastLE search for the last element that less than or equal to the key.
+	LastLE(k Key) Element
+
+	// FirstGT search for the first element that greater than to the key.
+	FirstGT(k Key) Element
+
+	// FirstGE search for the first element that greater than or equal to the key.
+	FirstGE(k Key) Element
 }

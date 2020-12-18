@@ -126,9 +126,14 @@ func (tr *Tree) Search(k container.Key) container.Element {
 	return node
 }
 
-// Iter return an Iterator, it's a wrap for bs.Iterator.
+// Iter return an Iterator, it's a wrap for tree.Iterator.
 func (tr *Tree) Iter(start container.Key, boundary container.Key) container.Iterator {
 	return tree.NewIterator(tr.root, start, boundary)
+}
+
+// Iter return an Iterator, it's a wrap for tree.IterReverse.
+func (tr *Tree) IterReverse(start container.Key, boundary container.Key) container.Iterator {
+	return tree.NewIteratorReverse(tr.root, start, boundary)
 }
 
 // Range calls f sequentially each TreeNode present in the Tree.

@@ -1,4 +1,4 @@
-// Copyright (c) 2019, Yu Wu <yu.771991@gmail.com> All rights reserved.
+// Copyright (c) 2020, Yu Wu <yu.771991@gmail.com> All rights reserved.
 //
 // Use of this source code is governed by a MIT-style license that can be
 // found in the LICENSE file.
@@ -12,9 +12,9 @@ import (
 	"github.com/yu31/gostructs/stack"
 )
 
-var _ container.Iterator = (*Iterator)(nil)
+var _ container.Iterator = (*IteratorReverse)(nil)
 
-// Iter creates an Iterator positioned on the first element that key >= start key.
+// Iter creates an reversed Iterator positioned on the first element that key >= start key.
 // If the start key is nil, it will return from the beginning.
 // It yields only keys that < boundary. If boundary is nil, iteration until the end.
 //
@@ -22,15 +22,15 @@ var _ container.Iterator = (*Iterator)(nil)
 //
 // The Iterator return element with in-order traversal,
 // And it can used with all-type binary search trees.
-type Iterator struct {
+type IteratorReverse struct {
 	stack    *stack.Stack
 	start    container.Key
 	boundary container.Key
 }
 
-// NewIterator creates an Iterator with given parameters.
-func NewIterator(root container.TreeNode, start container.Key, boundary container.Key) *Iterator {
-	it := &Iterator{
+// NewIteratorReverse creates an reversed Iterator with given parameters.
+func NewIteratorReverse(root container.TreeNode, start container.Key, boundary container.Key) *IteratorReverse {
+	it := &IteratorReverse{
 		stack:    stack.Default(),
 		start:    start,
 		boundary: boundary,
@@ -40,13 +40,13 @@ func NewIterator(root container.TreeNode, start container.Key, boundary containe
 }
 
 // Valid represents whether to have more elements in the Iterator.
-func (it *Iterator) Valid() bool {
+func (it *IteratorReverse) Valid() bool {
 	return !it.stack.Empty()
 }
 
 // Next returns a element and moved the iterator to the next Element.
 // Returns nil if no more elements.
-func (it *Iterator) Next() container.Element {
+func (it *IteratorReverse) Next() container.Element {
 	if it.stack.Empty() {
 		return nil
 	}
@@ -54,11 +54,11 @@ func (it *Iterator) Next() container.Element {
 	p := it.stack.Pop().(container.TreeNode)
 	n := p
 
-	it.fillStack(p.Right())
+	it.fillStack(p.Left())
 	return n
 }
 
-func (it *Iterator) fillStack(root container.TreeNode) {
+func (it *IteratorReverse) fillStack(root container.TreeNode) {
 	p := root
 	for p != nil && !reflect.ValueOf(p).IsNil() {
 		if it.start != nil && p.Key().Compare(it.start) == -1 {
@@ -71,6 +71,6 @@ func (it *Iterator) fillStack(root container.TreeNode) {
 		}
 
 		it.stack.Push(p)
-		p = p.Left()
+		p = p.Right()
 	}
 }

@@ -95,3 +95,17 @@ func reverseElementSlice(elements []container.Element) []container.Element {
 	}
 	return result
 }
+
+func reverseSeedsSlice(seeds []container.Int64) []container.Int64 {
+	if len(seeds) == 0 {
+		return nil
+	}
+	result := make([]container.Int64, len(seeds))
+	copy(result, seeds)
+
+	length := len(result)
+	for i := 0; i < length/2; i++ {
+		result[i], result[length-1-i] = result[length-1-i], result[i]
+	}
+	return result
+}

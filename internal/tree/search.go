@@ -13,7 +13,7 @@ import (
 )
 
 // Range calls f sequentially each TreeNode present in the Tree.
-// If f returns false, range stops the iteration.
+// If f returns false, Range stops the iteration.
 //
 // The range is start <= x < boundary.
 // The elements will return from the beginning if start is nil,
@@ -49,12 +49,8 @@ func Range(root container.TreeNode, start container.Key, boundary container.Key,
 	}
 }
 
-// Reverse calls f sequentially reverse each TreeNode present in the Tree.
-// If f returns false, range stops the iteration.
-//
-// The range is start <= x < boundary.
-// The elements will return from the beginning if start is nil,
-// And return until the end if the boundary is nil.
+// Reverse is similar to the Range method. And reverse iteration element.
+// If f returns false, Reverse stops the iteration.
 func Reverse(root container.TreeNode, start container.Key, boundary container.Key, f func(node container.TreeNode) bool) {
 	if root == nil {
 		return

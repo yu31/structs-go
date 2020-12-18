@@ -233,6 +233,12 @@ func (sl *List) Iter(start container.Key, boundary container.Key) container.Iter
 	return newIterator(sl, start, boundary)
 }
 
+// Iter return an Iterator, it's a wrap for tree.IterReverse.
+func (sl *List) IterReverse(start container.Key, boundary container.Key) container.Iterator {
+	// TODO:
+	panic("skiplist: IterReverse method not implemented")
+}
+
 // Range calls f sequentially each TreeNode present in the Tree.
 // If f returns false, range stops the iteration.
 func (sl *List) Range(start container.Key, boundary container.Key, f func(ele container.Element) bool) {
