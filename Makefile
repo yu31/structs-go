@@ -1,4 +1,4 @@
-# Copyright (C) 2019 wuyu, I.
+# Copyright (C) 2019 Yu.
 
 VERBOSE = no
 
