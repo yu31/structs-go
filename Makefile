@@ -1,4 +1,4 @@
-# Copyright (C) 2019 Yunify, Inc.
+# Copyright (C) 2019 wuyu, I.
 
 VERBOSE = no
 
