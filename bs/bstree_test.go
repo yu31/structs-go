@@ -7,7 +7,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/yu31/gostructs/container"
+	"github.com/yu31/structs-go/container"
 )
 
 // Iteration with recursion.

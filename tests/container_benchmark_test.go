@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/yu31/gostructs/container"
+	"github.com/yu31/structs-go/container"
 )
 
 func BenchmarkContainer_Insert(b *testing.B) {

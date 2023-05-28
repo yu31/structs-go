@@ -1,4 +1,4 @@
-module github.com/yu31/gostructs
+module github.com/yu31/structs-go
 
 go 1.15
 

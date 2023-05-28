@@ -6,8 +6,8 @@
 package bs
 
 import (
-	"github.com/yu31/gostructs/container"
-	"github.com/yu31/gostructs/internal/tree"
+	"github.com/yu31/structs-go/container"
+	"github.com/yu31/structs-go/internal/tree"
 )
 
 var (

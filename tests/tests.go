@@ -4,11 +4,11 @@ import (
 	"math/rand"
 	"time"
 
-	"github.com/yu31/gostructs/avl"
-	"github.com/yu31/gostructs/bs"
-	"github.com/yu31/gostructs/container"
-	"github.com/yu31/gostructs/rb"
-	"github.com/yu31/gostructs/skip"
+	"github.com/yu31/structs-go/avl"
+	"github.com/yu31/structs-go/bs"
+	"github.com/yu31/structs-go/container"
+	"github.com/yu31/structs-go/rb"
+	"github.com/yu31/structs-go/skip"
 )
 
 var containers = map[string]func() container.Container{

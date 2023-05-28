@@ -6,7 +6,7 @@
 package skip
 
 import (
-	"github.com/yu31/gostructs/container"
+	"github.com/yu31/structs-go/container"
 )
 
 var _ container.Iterator = (*Iterator)(nil)

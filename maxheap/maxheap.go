@@ -6,7 +6,7 @@
 package maxheap
 
 import (
-	"github.com/yu31/gostructs/container"
+	"github.com/yu31/structs-go/container"
 )
 
 const (

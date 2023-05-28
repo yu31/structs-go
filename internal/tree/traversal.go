@@ -8,8 +8,8 @@ package tree
 import (
 	"reflect"
 
-	"github.com/yu31/gostructs/container"
-	"github.com/yu31/gostructs/stack"
+	"github.com/yu31/structs-go/container"
+	"github.com/yu31/structs-go/stack"
 )
 
 // LDR calls f sequentially each TreeNode by in-order traversal.
