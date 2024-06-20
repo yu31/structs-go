@@ -16,12 +16,12 @@ type Stack struct {
 	len   int
 }
 
-// Default creates an Stack with default parameters.
+// Default creates a Stack with default parameters.
 func Default() *Stack {
 	return New(defaultCapacity)
 }
 
-// New creates an Stack with the given the initialization capacity.
+// New creates a Stack with the given the initialization capacity.
 func New(n int) *Stack {
 	s := &Stack{
 		items: make([]interface{}, n),

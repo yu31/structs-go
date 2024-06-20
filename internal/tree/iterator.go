@@ -14,14 +14,14 @@ import (
 
 var _ container.Iterator = (*Iterator)(nil)
 
-// Iter creates an Iterator positioned on the first element that key >= start key.
+// Iterator creates an Iterator positioned on the first element that key >= start key.
 // If the start key is nil, it will return from the beginning.
 // It yields only keys that < boundary. If boundary is nil, iteration until the end.
 //
 // Thus, the ranges is: start <= x < boundary.
 //
 // The Iterator return element with in-order traversal,
-// And it can used with all-type binary search trees.
+// And it can use with all-type binary search trees.
 type Iterator struct {
 	stack    *stack.Stack
 	start    container.Key
@@ -44,7 +44,7 @@ func (it *Iterator) Valid() bool {
 	return !it.stack.Empty()
 }
 
-// Next returns a element and moved the iterator to the next Element.
+// Next returns an element and moved the iterator to the next Element.
 // Returns nil if no more elements.
 func (it *Iterator) Next() container.Element {
 	if it.stack.Empty() {

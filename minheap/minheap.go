@@ -14,6 +14,7 @@ const (
 )
 
 // Type aliases for simplifying use in this package.
+
 type Key = container.Key
 type Value = container.Value
 
@@ -35,12 +36,12 @@ func (item *Item) Value() Value {
 	return item.value
 }
 
-// Value returns the index of the item.
+// Index returns the index of the item.
 func (item *Item) Index() int {
 	return item.index
 }
 
-// MinHeap implements min heap and can used as priority queue.
+// MinHeap implements min heap and can use as priority queue.
 type MinHeap struct {
 	items []*Item
 	cap   int

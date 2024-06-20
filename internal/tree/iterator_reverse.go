@@ -14,7 +14,7 @@ import (
 
 var _ container.Iterator = (*IteratorReverse)(nil)
 
-// Iter creates an reversed Iterator positioned on the first element that key >= start key.
+// IteratorReverse creates an reversed Iterator positioned on the first element that key >= start key.
 // If the start key is nil, it will return from the beginning.
 // It yields only keys that < boundary. If boundary is nil, iteration until the end.
 //

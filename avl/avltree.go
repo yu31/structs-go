@@ -134,7 +134,7 @@ func (tr *Tree) Iter(start container.Key, boundary container.Key) container.Iter
 	return tree.NewIterator(tr.root, start, boundary)
 }
 
-// Iter return an Iterator, it's a wrap for tree.IterReverse.
+// IterReverse return an Iterator, it's a wrap for tree.IterReverse.
 func (tr *Tree) IterReverse(start container.Key, boundary container.Key) container.Iterator {
 	return tree.NewIteratorReverse(tr.root, start, boundary)
 }

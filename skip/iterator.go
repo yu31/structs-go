@@ -11,7 +11,7 @@ import (
 
 var _ container.Iterator = (*Iterator)(nil)
 
-// Iter creates an Iterator positioned on the first element that key >= start key.
+// Iterator creates an Iterator positioned on the first element that key >= start key.
 // If the start key is nil, it will return from the beginning.
 // It yields only keys that < boundary. If boundary is nil, iteration until the end.
 //

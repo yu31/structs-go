@@ -64,7 +64,7 @@ type Tree struct {
 	len  int
 }
 
-// New creates an Red-Black Tree.
+// New creates a Red-Black Tree.
 func New() *Tree {
 	return &Tree{
 		root: nil,
@@ -179,7 +179,7 @@ func (tr *Tree) FirstGE(k container.Key) container.Element {
 	return tree.FirstGE(tr.root, k)
 }
 
-// The insertOrSearch inserts and returns a new node with the given key and value if key doesn't exists.
+// The insertOrSearch inserts and returns a new node with the given key and value if key doesn't exist.
 // Or else, returns the exists node for the key if present.
 // The ok result is true if the node was inserted, false if searched.
 func (tr *Tree) insertOrSearch(k container.Key, v container.Value) (node *treeNode, ok bool) {

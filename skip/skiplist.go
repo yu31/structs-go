@@ -46,7 +46,7 @@ type List struct {
 	r     *rand.Rand
 }
 
-// New creates an Skip List.
+// New creates a Skip List.
 func New() *List {
 	sl := new(List)
 	sl.head = sl.createNode(nil, nil, maxLevel)
@@ -233,7 +233,7 @@ func (sl *List) Iter(start container.Key, boundary container.Key) container.Iter
 	return newIterator(sl, start, boundary)
 }
 
-// Iter return an Iterator, it's a wrap for tree.IterReverse.
+// IterReverse return an Iterator, it's a wrap for tree.IterReverse.
 func (sl *List) IterReverse(start container.Key, boundary container.Key) container.Iterator {
 	// TODO:
 	panic("skiplist: IterReverse method not implemented")
@@ -241,7 +241,7 @@ func (sl *List) IterReverse(start container.Key, boundary container.Key) contain
 
 // Range calls f sequentially each TreeNode present in the Tree.
 // If f returns false, range stops the iteration.
-func (sl *List) Range(start container.Key, boundary container.Key, f func(ele container.Element) bool) {
+func (sl *List) Range(start container.Key, boundary container.Key, f func(elem container.Element) bool) {
 	var node *listNode
 	var end *listNode
 

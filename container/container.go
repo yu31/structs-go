@@ -52,7 +52,7 @@ type Container interface {
 	Search(k Key) Element
 }
 
-// The iterator is an interface for iteration return element.
+// Iterator is an interface for iteration return element.
 type Iterator interface {
 	// Valid represents whether to have more elements in the Iterator.
 	// Returns false if no more.
@@ -84,7 +84,7 @@ type Retriever interface {
 	// Thus, the ranges is: start <= x < boundary.
 	Iter(start Key, boundary Key) Iterator
 
-	// Iter creates an reversed Iterator positioned on the first element that key >= start key.
+	// IterReverse creates an reversed Iterator positioned on the first element that key >= start key.
 	// If the start key is nil, it will return from the beginning.
 	// It yields only keys that < boundary. If boundary is nil, iteration until the end.
 	//
